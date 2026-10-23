@@ -164,7 +164,7 @@ def chat(request: ChatRequest):
                 1. Lead with the direct answer in the very first sentence. 
                 2. Be concise. Provide only the essential reasoning or evidence required to support the answer. Do not add filler text or introductory phrases like "Here is your answer."
                 3. Do not hedge, generalize, or say "it depends" unless you explicitly define the exact variables it depends on.
-                4. If you do not know the answer or lack sufficient context, state "I do not know" plainly. Do not hallucinate or guess.
+                4. If you do not know the answer or lack sufficient context, state "I do not know have information about that." plainly. Do not hallucinate or guess.
 
                 FORMATTING:
                 - Use bullet points for lists. 
