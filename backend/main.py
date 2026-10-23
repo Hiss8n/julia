@@ -10,8 +10,8 @@ from pypdf import PdfReader
 load_dotenv()
 app=FastAPI(title="Julia Kakuma")
 origins=[
-    "https://your-react-frontend.onrender.com",  # Replace with your actual Render frontend URL
-    "http://localhost:3000",                     # For local React development
+    "*",  # Replace with your actual Render frontend URL
+    "http://localhost:8000",                     # For local React development
     "http://localhost:5173"]
 app.add_middleware(
     CORSMiddleware,
@@ -21,9 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(
-    CORSMiddleware=("https:render.com")
-)
 
 COHERE=os.getenv("COHERE") 
 co = cohere.ClientV2(
@@ -44,7 +41,8 @@ CHROMA_DATABASE=os.getenv("CHROMA_DATABASE")
 client = chromadb.CloudClient(  
     tenant=CHROMA_TENANT,
     database=CHROMA_DATABASE,
-    api_key=CHROMA_API_KEY
+    api_key=CHROMA_API_KEY,
+    
 )
 
 
@@ -58,8 +56,6 @@ print(client.heartbeat())
 
 class ChatRequest(BaseModel):
     message: str
-    max_token:500
-
 
 
 @app.get("/")
@@ -137,17 +133,14 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 
 @app.post("/query")
-def chat(req:ChatRequest):
-    client = cohere.ClientV2(
-        api_key=COHERE
+def chat(request: ChatRequest):
+    vec = co.embed(
+        texts=[request.message],
+        model="embed-english-v3.0",
+        input_type="search_query",
+        embedding_types=["float"],
+        output_dimension=1024
     )
-    vec = client.embed(
-            texts=[ChatRequest.message],
-            model="embed-english-v3.0",
-            input_type="search_document",
-            embedding_types=["float"],
-            output_dimension=1024
-        ) 
     #print(f"EMD{response.embeddings.float_[0]}")
     
     result=collection.query(
@@ -160,7 +153,7 @@ def chat(req:ChatRequest):
     retrieved_context = " ".join(result['documents'][0])
     print(f"ret{retrieved_context}")
    
-    user_prompt = f"Context:\n{retrieved_context}\n\nQuestion: {ChatRequest.message}" 
+    user_prompt = f"Context:\n{retrieved_context}\n\nQuestion: {request.message}"
     response = co.chat(
         model="command-a-plus-05-2026",
         messages=[
@@ -186,16 +179,21 @@ def chat(req:ChatRequest):
         ],
         
     )
-    print(f"AI:{response.message.content[1].text}")
+    answer_text = ""
+    for content in response.message.content:
+        # Check if the content block is a text type and contains a text attribute
+        if getattr(content, "type", None) == "text" and hasattr(content, "text"):
+            answer_text = content.text
+            break
 
-    return response.message.content[1].text
+    # Fallback if no explicit text type was found
+    if not answer_text and len(response.message.content) > 0:
+        # If the item has a 'text' attribute directly, use it
+        if hasattr(response.message.content[0], "text"):
+            answer_text = response.message.content[0].text
 
-question=input("How can I help you today?...")
-while question!="" or "q" or "quite" or "QUITE":
-        
-        answer=chat("How many learners?")
-        print(f"AI:{answer}")
- 
+    return {"answer": answer_text}
+    
 
 
 
