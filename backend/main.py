@@ -45,8 +45,6 @@ client = chromadb.CloudClient(
     
 )
 
-
-
 collection = client.get_or_create_collection(
     name="agents",
     metadata={"hnsw:space": "cosine"}
@@ -56,7 +54,6 @@ print(client.heartbeat())
 
 class ChatRequest(BaseModel):
     message: str
-
 
 @app.get("/")
 async def health():
@@ -70,6 +67,7 @@ async def health():
 async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="File must be a PDF.")
+    print("runned")
     
     try:
         contents = await file.read()
@@ -109,11 +107,11 @@ async def upload_pdf(file: UploadFile = File(...)):
         #print(f"{response.embeddings.float_[0]}")
         #embeddings.append(response.embeddings.float_[0])
         collection.upsert(
-                ids=["doc-001"],
-                documents=["RAG retrieves relevant information for an LLM."],
+                ids=ids,
+                documents=documents,
                 embeddings=response.embeddings.float_[0]
             )
-        print("************")
+        print("***")
         print("done!!!")
 
     
@@ -128,8 +126,6 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-
-
 
 
 @app.post("/query")
@@ -151,7 +147,7 @@ def chat(request: ChatRequest):
     )
 
     retrieved_context = " ".join(result['documents'][0])
-    print(f"ret{retrieved_context}")
+    #print(f"ret{retrieved_context}")
    
     user_prompt = f"Context:\n{retrieved_context}\n\nQuestion: {request.message}"
     response = co.chat(
@@ -195,7 +191,7 @@ def chat(request: ChatRequest):
     return {"answer": answer_text}
     
 
-
+ 
 
 
 
