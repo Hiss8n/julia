@@ -3,5 +3,6 @@ cohere
 chromadb
 fastApi
 pypdf
-FastAPI, UploadFile, File, HTTPException
+FastAPI
 pydantic
+python-dotenv
