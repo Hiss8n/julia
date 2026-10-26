@@ -21,7 +21,7 @@ button, textarea { font: inherit; }
 .chat-layout { width: 100%; height: 100vh; min-height: 420px; display: flex; background: #151238; }
 .chat-page { width: 72%; flex: 0 0 72%; height: 100%; min-width: 0; margin-left: 14%; display: flex; flex-direction: column; background: #1b1749; }
 .empty-side-panel { width: 14%; flex: 0 0 14%; min-width: 0; border-left: 1px solid #302b65; background: #151238; }
-.chat-header { height: 58px; flex: 0 0 58px; display: flex; align-items: center; gap: 10px; padding: 0 24px; border-bottom: 1px solid #302b65; color: #f5f4ff; font: 600 15px 'Manrope', sans-serif; }
+.chat-header { height: 68px; flex: 0 0 58px; display: flex; align-items: center; gap: 10px; padding: 0 24px; border-bottom: 1px solid #302b65; color: #f5f4ff; font: 600 15px 'Manrope', sans-serif; }
 .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px #11ccf526; }
 .chat-content { flex: 1; min-height: 0; overflow-y: auto; display: flex; justify-content: center; padding: 24px 20px 12px; }
 .empty-state { margin: auto 0; text-align: center; transform: translateY(-24px); }

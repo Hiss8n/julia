@@ -48,7 +48,10 @@ export default function ChatPage() {
   return (
     <div className="chat-layout">
       <main className="chat-page">
-        <header className="chat-header"><span className="text-md" >🫠</span>Julia </header>
+        <header className="chat-header">
+          <img src='/logo.png' width={60} height={60}/>
+          
+          Julia </header>
         <section className="chat-content" aria-label="Chat conversation">
           {messages.length === 0 ? (
             <div className="empty-state">
