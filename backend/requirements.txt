@@ -1,4 +1,4 @@
-unicorn
+uvicorn
 cohere
 chromadb
 fastApi
