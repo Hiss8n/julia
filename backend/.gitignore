@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.vercel/
+.api/__pycache__
