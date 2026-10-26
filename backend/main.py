@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 load_dotenv()
 app=FastAPI(title="Julia Kakuma")
+
 origins=[
     "*",  # Replace with your actual Render frontend URL
     "http://localhost:8000",                     # For local React development
