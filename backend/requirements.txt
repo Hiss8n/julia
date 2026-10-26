@@ -1,8 +1,7 @@
 uvicorn
 cohere
 chromadb
-fastApi
+fastapi
 pypdf
-FastAPI
 pydantic
 python-dotenv
