@@ -8,36 +8,27 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 load_dotenv()
-app=FastAPI(title="Julia Kakuma")
 
-origins=[
-    "*",  # Replace with your actual Render frontend URL
-    "http://localhost:8000",                     # For local React development
-    "http://localhost:5173"]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
+app=FastAPI()
 
 COHERE=os.getenv("COHERE") 
+
 co = cohere.ClientV2(
-            api_key=COHERE
+        api_key=COHERE
         )
+
 client = cohere.ClientV2(
 api_key=COHERE
 )
 
-#uPLOAD PDf
+
 
 CHROMA_TENANT=os.getenv("CHROMA_TENANT") 
 CHROMA_HOST=os.getenv("CHROMA_HOST") 
 CHROMA_API_KEY=os.getenv("CHROMA_API_KEY") 
 CHROMA_DATABASE=os.getenv("CHROMA_DATABASE") 
-# Store database files in your backend folder
+
 
 client = chromadb.CloudClient(  
     tenant=CHROMA_TENANT,
@@ -50,8 +41,19 @@ collection = client.get_or_create_collection(
     name="agents",
     metadata={"hnsw:space": "cosine"}
 )
+origins=[
+    "*", 
+    "http://localhost:8000",                   
+    "http://localhost:5173"]
 
-print(client.heartbeat())
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class ChatRequest(BaseModel):
     message: str
