@@ -23,26 +23,34 @@ api_key=COHERE
 )
 
 
-
+""" 
 CHROMA_TENANT=os.getenv("CHROMA_TENANT") 
 CHROMA_HOST=os.getenv("CHROMA_HOST") 
 CHROMA_API_KEY=os.getenv("CHROMA_API_KEY") 
-CHROMA_DATABASE=os.getenv("CHROMA_DATABASE") 
+CHROMA_DATABASE=os.getenv("CHROMA_DATABASE")  """
+
+CHROMA_SERVER_HOST = os.getenv("CHROMA_SERVER_HOST", "api.trychroma.com")
+CHROMA_SERVER_PORT = int(os.getenv("CHROMA_SERVER_PORT", "443"))
+CHROMA_TENANT = os.getenv("CHROMA_TENANT", "")
+CHROMA_DATABASE = os.getenv("CHROMA_DATABASE", "")
+CHROMA_AUTH_TOKEN = os.getenv("CHROMA_AUTH_TOKEN", "")
 
 
-client = chromadb.CloudClient(  
+     # Connecting to a remote/cloud Chroma instance using HttpClient or Auth tokens
+chroma_client = chromadb.CloudClient(  
     tenant=CHROMA_TENANT,
     database=CHROMA_DATABASE,
-    api_key=CHROMA_API_KEY,
+    api_key=CHROMA_AUTH_TOKEN,
     
 )
-
-collection = client.get_or_create_collection(
+print(f"anyways: {chroma_client.heartbeat()}")
+ 
+collection =chroma_client.get_or_create_collection(
     name="agents",
     metadata={"hnsw:space": "cosine"}
 )
 origins=[
-    "*", 
+    "https://julia-c2n3.vercel.app", 
     "http://localhost:8000",                   
     "http://localhost:5173"]
 
