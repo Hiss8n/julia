@@ -1,9 +1,10 @@
-""" import os
+import os
 import io
 from dotenv import load_dotenv
 import chromadb
 from pydantic import BaseModel
 import cohere
+import uvicorn
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
@@ -19,49 +20,55 @@ co = cohere.ClientV2(
 
 client = cohere.ClientV2(
 api_key=COHERE
-) """
+) 
 
 
-""" 
+
 CHROMA_TENANT=os.getenv("CHROMA_TENANT") 
 CHROMA_HOST=os.getenv("CHROMA_HOST") 
 CHROMA_API_KEY=os.getenv("CHROMA_API_KEY") 
-CHROMA_DATABASE=os.getenv("CHROMA_DATABASE")  """
-""" 
+CHROMA_DATABASE=os.getenv("CHROMA_DATABASE") 
+
+
+
 CHROMA_SERVER_HOST = os.getenv("CHROMA_SERVER_HOST", "api.trychroma.com")
 CHROMA_SERVER_PORT = int(os.getenv("CHROMA_SERVER_PORT", "443"))
 CHROMA_TENANT = os.getenv("CHROMA_TENANT", "")
 CHROMA_DATABASE = os.getenv("CHROMA_DATABASE", "")
-CHROMA_AUTH_TOKEN = os.getenv("CHROMA_AUTH_TOKEN", "") """
+CHROMA_AUTH_TOKEN = os.getenv("CHROMA_AUTH_TOKEN", "") 
 
 
-     # Connecting to a remote/cloud Chroma instance using HttpClient or Auth tokens
-#chroma_client = chromadb.CloudClient(  
+#Connecting to a remote/cloud Chroma instance using HttpClient or Auth tokens
+chroma_client = chromadb.CloudClient(  
     tenant=CHROMA_TENANT,
     database=CHROMA_DATABASE,
     api_key=CHROMA_AUTH_TOKEN,
     
 )
-#print(f"anyways: {chroma_client.heartbeat()}")
+print(f"anyways: {chroma_client.heartbeat()}")
  
-#collection =chroma_client.get_or_create_collection(
+collection =chroma_client.get_or_create_collection(
     name="agents",
     metadata={"hnsw:space": "cosine"}
 )
-#origins=[
+
+app=FastAPI()
+
+
+origins=[
     "https://julia-c2n3.vercel.app", 
     "http://localhost:8000",                   
     "http://localhost:5173"]
 
-#app.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-from fastapi import FastAPI
-app=FastAPI()
+
+
 
 @app.get("/")
 async def health():
@@ -71,8 +78,8 @@ async def health():
         "status":"good!"
     }
 
-#@app.post("/uplaod")
-#async def upload_pdf(file: UploadFile = File(...)):
+@app.post("/uplaod")
+async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="File must be a PDF.")
     print("runned")
@@ -112,8 +119,7 @@ async def health():
                 embedding_types=["float"],
                 output_dimension=1024
             )
-        #print(f"{response.embeddings.float_[0]}")
-        #embeddings.append(response.embeddings.float_[0])
+ 
         collection.upsert(
                 ids=ids,
                 documents=documents,
@@ -136,8 +142,8 @@ async def health():
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-#@app.post("/query")
-#def chat(message):
+@app.post("/query")
+def chat(message):
     vec = co.embed(
         texts=[message],
         model="embed-english-v3.0",
