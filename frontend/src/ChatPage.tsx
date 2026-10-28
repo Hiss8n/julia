@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
+
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -32,7 +33,7 @@ export default function ChatPage() {
         body: JSON.stringify({ message }),
       })
       if (!response.ok) {
-        const details = await response.json().catch(() => null)
+        const details = await response.json().catch(() => "Somthing went wrong.Please try again later")
         throw new Error(details?.detail ?? `Request failed (${response.status})`)
       }
 

@@ -2,9 +2,7 @@ import os
 import io
 from dotenv import load_dotenv
 import chromadb
-from pydantic import BaseModel
 import cohere
-import uvicorn
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
