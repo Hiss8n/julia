@@ -32,8 +32,10 @@ export default function ChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message }),
       })
+      console.log(response)
       if (!response.ok) {
         const details = await response.json().catch(() => "Somthing went wrong.Please try again later")
+        console.log(details)
         throw new Error(details?.detail ?? `Request failed (${response.status})`)
       }
 
@@ -64,7 +66,7 @@ export default function ChatPage() {
               {messages.map((message, index) => (
                 <article className={`message ${message.role}`} key={index}>
                   <span className="message-label">{message.role === 'user' ? 'You' : 'Julia'}</span>
-                  <p>{message.content}</p>
+                  <p>{message?.content}</p>
                 </article>
               ))}
               {loading && <div className="message assistant"><span className="message-label">Julia</span><p className="loading-text">Thinking…</p></div>}

@@ -3,6 +3,7 @@ import io
 from dotenv import load_dotenv
 import chromadb
 import cohere
+from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
@@ -66,6 +67,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+class chatQuery(BaseModel):
+    message:str
 
 
 @app.get("/")
@@ -141,9 +145,9 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 
 @app.post("/query")
-def chat(message):
+def chat(req:chatQuery):
     vec = co.embed(
-        texts=[message],
+        texts=[req.message],
         model="embed-english-v3.0",
         input_type="search_query",
         embedding_types=["float"],
@@ -161,7 +165,7 @@ def chat(message):
     retrieved_context = " ".join(result['documents'][0])
     #print(f"ret{retrieved_context}")
    
-    user_prompt = f"Context:\n{retrieved_context}\n\nQuestion: {message}"
+    user_prompt = f"Context:\n{retrieved_context}\n\nQuestion: {req.message}"
     response = co.chat(
         model="command-a-plus-05-2026",
         messages=[
