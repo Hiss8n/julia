@@ -7,6 +7,8 @@ from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
+from apscheduler.schedulers.background import BackgroundScheduler
+import httpx
 load_dotenv()
 
 
@@ -70,6 +72,22 @@ app.add_middleware(
 
 class chatQuery(BaseModel):
     message:str
+
+
+def ping_health_check():
+    # Replace with your actual deployed URL or localhost URL
+    url = "http://127.0.0.1:8000/" 
+    try:
+        response = httpx.get(url)
+        print(f"Health check pinged: {response.status_code}")
+    except Exception as e:
+        print(f"Ping failed: {e}")
+
+# Initialize and start the scheduler
+scheduler = BackgroundScheduler()
+# Run every 14 minutes
+scheduler.add_job(ping_health_check, 'interval', minutes=14)
+scheduler.start()
 
 
 @app.get("/")
