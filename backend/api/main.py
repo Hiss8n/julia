@@ -76,7 +76,7 @@ class chatQuery(BaseModel):
 
 def ping_health_check():
     # Replace with your actual deployed URL or localhost URL
-    url = "http://127.0.0.1:8000/" 
+    url = "https://julia-pycq.onrender.com" 
     try:
         response = httpx.get(url)
         print(f"Health check pinged: {response.status_code}")
