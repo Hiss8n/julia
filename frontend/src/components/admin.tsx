@@ -1,6 +1,6 @@
 
 
-function admin() {
+function Admin() {
   return (
     <div>
         <h3>Admin DashBoard:???</h3>
@@ -9,4 +9,4 @@ function admin() {
   )
 }
 
-export default admin
+export default Admin
