@@ -9,7 +9,7 @@ python-multipart
 APScheduler
 httpx
 sqlalchemy
+psycopg[binary]
 bcrypt
 PyJWT
 email-validator
-jwt
