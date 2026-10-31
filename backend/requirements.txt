@@ -8,3 +8,8 @@ python-dotenv
 python-multipart
 APScheduler
 httpx
+sqlalchemy
+bcrypt
+PyJWT
+email-validator
+jwt

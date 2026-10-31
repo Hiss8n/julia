@@ -7,10 +7,11 @@ import SignUp from './components/sign-up'
 import './index.css'
 
 export default function App() {
+  const isLoggin=true
   return (
   
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={isLoggin?<ChatPage />:<Navigate to="/login" replace />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign-in" element={<Login />} />

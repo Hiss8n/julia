@@ -1,14 +1,33 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+
+type LoginData  = {
+	
+	email: string
+	password: string
+}
+
 export default function Login() {
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [notice, setNotice] = useState('')
+    const [userData, setUserData] = useState<LoginData>({
+      
+        email: '',
+        password: '',
+    })
 
-	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		event.preventDefault()
-		setNotice('Sign-in is not connected yet. Please check back soon.')
-	}
+    function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const { name, value } = event.currentTarget
+        const field = name as keyof LoginData
+        setUserData((current) => ({ ...current, [field]: value }))
+    }
+
+    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        setNotice(`Thanks, ${userData.email}. Your details were captured, but account creation is not connected yet.`)
+        console.log("data",userData)
+    }
 
 	return (
 		<main className="login-shell">
@@ -45,7 +64,9 @@ export default function Login() {
 							type="email"
 							placeholder="you@example.com"
 							autoComplete="email"
+                            value={userData.email}
 							required
+                            onChange={handleInputChange}
 						/>
 
 						<div className="login-password-label">
@@ -66,6 +87,8 @@ export default function Login() {
 								placeholder="Enter your password"
 								autoComplete="current-password"
 								required
+                                value={userData.password}
+                                onChange={handleInputChange}
 							/>
 							<button
 								className="login-reveal-button"

@@ -23,6 +23,16 @@ CHROMA_HOST=your_chroma_host
 
 The application reads these values when it starts. `COHERE`, `CHROMA_TENANT`, `CHROMA_DATABASE`, and `CHROMA_API_KEY` are used by the current implementation. `CHROMA_HOST` is read but is not currently used to construct the Chroma Cloud client. Do not commit `.env` or put secret values in source control.
 
+Authentication configuration:
+
+```env
+DATABASE_URL=sqlite:///./julia.db
+AUTH_SECRET_KEY=replace_with_a_long_random_secret
+ACCESS_TOKEN_MINUTES=60
+```
+
+The database defaults to a local SQLite file. Set `DATABASE_URL` to a PostgreSQL SQLAlchemy URL for production (for example, `postgresql+psycopg://user:password@host:5432/database`). Set `AUTH_SECRET_KEY` to a strong, persistent random secret in every deployed environment; without it, a temporary key is generated at process startup and existing tokens become invalid after a restart. The `users` table is created on application startup.
+
 ## Run Locally
 
 From the `backend` directory, create and activate a virtual environment, then install the dependencies:
@@ -40,6 +50,38 @@ python -m uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API is available at `http://localhost:8000`. Interactive OpenAPI documentation is available at `http://localhost:8000/docs`; the health endpoint is `http://localhost:8000/`.
+
+## Authentication API
+
+Authentication is implemented in `api/auth/`, separately from the main route module. Passwords are stored as bcrypt hashes and are verified during login; they are never decrypted or returned. Successful registration and login return an access token and public user details.
+
+### `POST /auth/register`
+
+```json
+{
+	"first_name": "Ada",
+	"second_name": "Lovelace",
+	"email": "ada@example.com",
+	"password": "at-least-8-characters"
+}
+```
+
+Returns `201 Created` with `access_token`, `token_type`, and `user`. Existing email addresses return `409 Conflict`.
+
+### `POST /auth/login`
+
+```json
+{
+	"email": "ada@example.com",
+	"password": "at-least-8-characters"
+}
+```
+
+Returns the same response shape as registration. Incorrect credentials return `401 Unauthorized`.
+
+### `GET /auth/me`
+
+Returns the authenticated user's public details. Send the token in the `Authorization: Bearer <access_token>` header. Tokens expire after `ACCESS_TOKEN_MINUTES`.
 
 ## API Endpoints
 

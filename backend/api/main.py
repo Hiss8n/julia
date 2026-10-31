@@ -1,6 +1,8 @@
 import os
 import io
 from dotenv import load_dotenv
+load_dotenv()
+
 import chromadb
 import cohere
 from pydantic import BaseModel
@@ -9,7 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 from apscheduler.schedulers.background import BackgroundScheduler
 import httpx
-load_dotenv()
+from api.auth.routes import router as auth_router
+from api.database import Base, engine
+from api import models  # noqa: F401
 
 
 
@@ -54,6 +58,12 @@ collection =chroma_client.get_or_create_collection(
 )
 
 app=FastAPI()
+app.include_router(auth_router)
+
+
+@app.on_event("startup")
+def create_database_tables():
+    Base.metadata.create_all(bind=engine)
 
 
 origins=[
