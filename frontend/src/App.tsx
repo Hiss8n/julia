@@ -1,24 +1,41 @@
 
-import {  Navigate, Route, Routes } from 'react-router-dom'
+import { useEffect, type ReactNode } from 'react'
+import { Navigate, replace, Route, Routes } from 'react-router-dom'
 import ChatPage from './ChatPage'
 import Admin from './components/admin'
 import Login from './components/login'
 import SignUp from './components/sign-up'
+import { useAuthStore } from './store/authStore'
 import './index.css'
 
+/*  function ProtectedRoute({ children }: { children: ReactNode }) {
+   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth) 
+  const token = useAuthStore((state) => state.token)
+
+  if ( !token) return <main className="login-shell" aria-live="polite">Checking your session…</main>
+  return token? children : <Navigate to="/login" replace />
+} */
+ 
 export default function App() {
-  const isLoggin=true
+  const checkAuth = useAuthStore((state) => state.checkAuth)
+  const token = useAuthStore((state) => state.token)
+
+  console.log("tok:",token)
+
+  useEffect(() => {
+    void checkAuth()
+  }, [checkAuth])
+
   return (
-  
       <Routes>
-        <Route path="/" element={isLoggin?<ChatPage />:<Navigate to="/login" replace />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sign-in" element={<Login />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/" element={token?<ChatPage />:<Navigate to={"/sign-up"} replace/>} />
+        <Route path="/sign-up" element={!token?<SignUp />:<Navigate to={"/chat"} replace/>} />
+        <Route path="/login" element={!token?<Login />:<Navigate to={"/chat"} replace/>} />
+        <Route path="/sign-in" element={!token?<Login />:<Navigate to={"/chat"} replace/>} />
+        <Route path="/chat" element={token?<ChatPage />:<Navigate to={"/sign-up"} replace/>} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-   
   )
 }

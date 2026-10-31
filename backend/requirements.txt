@@ -13,3 +13,4 @@ psycopg[binary]
 bcrypt
 PyJWT
 email-validator
+psycopg2-binary

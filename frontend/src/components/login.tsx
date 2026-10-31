@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
 
 
 type LoginData  = {
@@ -9,6 +10,10 @@ type LoginData  = {
 }
 
 export default function Login() {
+	const navigate = useNavigate()
+	const login = useAuthStore((state) => state.login)
+	const isLoading = useAuthStore((state) => state.isLoading)
+	const authError = useAuthStore((state) => state.error)
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [notice, setNotice] = useState('')
     const [userData, setUserData] = useState<LoginData>({
@@ -23,10 +28,10 @@ export default function Login() {
         setUserData((current) => ({ ...current, [field]: value }))
     }
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
-        setNotice(`Thanks, ${userData.email}. Your details were captured, but account creation is not connected yet.`)
-        console.log("data",userData)
+		setNotice('')
+		if (await login(userData)) navigate('/chat', { replace: true })
     }
 
 	return (
@@ -105,10 +110,10 @@ export default function Login() {
 							<span>Keep me signed in</span>
 						</label>
 
-						<button className="login-submit" type="submit">
-							Sign in <span aria-hidden="true">&#8594;</span>
+						<button className="login-submit" type="submit" disabled={isLoading}>
+							{isLoading ? 'Signing in…' : 'Sign in'} <span aria-hidden="true">&#8594;</span>
 						</button>
-						<p className="login-notice" role="status" aria-live="polite">{notice}</p>
+						<p className="login-notice" role="status" aria-live="polite">{authError || notice}</p>
 					</form>
 
 					<p className="login-signup">

@@ -10,8 +10,8 @@ database_url = os.getenv("DATABASE_URL")
 if not database_url:
 	raise RuntimeError("DATABASE_URL must be set in the backend environment")
 
-if database_url.startswith("postgresql_psycopg://"):
-	database_url = database_url.replace("postgresql_psycopg://", "postgresql+psycopg://", 1)
+if database_url.startswith("postgresql://"):
+	database_url = database_url.replace("postgresql://", "postgresql://", 1)
 
 database_url = make_url(database_url)
 if (

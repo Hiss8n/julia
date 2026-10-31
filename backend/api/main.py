@@ -67,9 +67,10 @@ def create_database_tables():
 
 
 origins=[
+    "http://localhost:5173",
     "https://julia-c2n3.vercel.app", 
     "http://localhost:8000",                   
-    "http://localhost:5173"]
+    ]
 
 app.add_middleware(
     CORSMiddleware,
@@ -86,7 +87,7 @@ class chatQuery(BaseModel):
 
 def ping_health_check():
     # Replace with your actual deployed URL or localhost URL
-    url = "https://julia-pycq.onrender.com" 
+    url = "https://julia-c2n3.vercel.app" 
     try:
         response = httpx.get(url)
         print(f"Health check pinged: {response.status_code}")

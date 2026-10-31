@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
 
 type SignUpFormData = {
 	firstName: string
@@ -9,6 +10,10 @@ type SignUpFormData = {
 }
 
 export default function SignUp() {
+	const navigate = useNavigate()
+	const register = useAuthStore((state) => state.register)
+	const isLoading = useAuthStore((state) => state.isLoading)
+	const authError = useAuthStore((state) => state.error)
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [notice, setNotice] = useState('')
 	const [userData, setUserData] = useState<SignUpFormData>({
@@ -24,10 +29,17 @@ export default function SignUp() {
 		setUserData((current) => ({ ...current, [field]: value }))
 	}
 
-	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
-		setNotice(`Thanks, ${userData.firstName.trim()}. Your details were captured, but account creation is not connected yet.`)
-        console.log("data",userData)
+		setNotice('')
+		if (await register(userData)){
+			alert("user logging In...")
+			navigate('/chat', { replace: true })
+
+
+		} else{
+			alert("error loging")
+		}
 	}
 
 	return (
@@ -127,10 +139,10 @@ export default function SignUp() {
 							<span className="signup-hint">Use at least 8 characters.</span>
 						</div>
 
-						<button className="login-submit signup-submit" type="submit">
-							Create account <span aria-hidden="true">&#8594;</span>
+						<button className="login-submit signup-submit" type="submit" disabled={isLoading}>
+							{isLoading ? 'Creating account…' : 'Create account'} <span aria-hidden="true">&#8594;</span>
 						</button>
-						<p className="login-notice" role="status" aria-live="polite">{notice}</p>
+						<p className="login-notice" role="status" aria-live="polite">{authError || notice}</p>
 					</form>
 
 					<p className="login-signup">
