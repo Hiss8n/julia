@@ -1,6 +1,6 @@
 
-import { useEffect, type ReactNode } from 'react'
-import { Navigate, replace, Route, Routes } from 'react-router-dom'
+import { useEffect} from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import ChatPage from './ChatPage'
 import Admin from './components/admin'
 import Login from './components/login'
@@ -29,13 +29,13 @@ export default function App() {
 
   return (
       <Routes>
-        <Route path="/" element={token?<ChatPage />:<Navigate to={"/sign-up"} replace/>} />
-        <Route path="/sign-up" element={!token?<SignUp />:<Navigate to={"/chat"} replace/>} />
-        <Route path="/login" element={!token?<Login />:<Navigate to={"/chat"} replace/>} />
-        <Route path="/sign-in" element={!token?<Login />:<Navigate to={"/chat"} replace/>} />
-        <Route path="/chat" element={token?<ChatPage />:<Navigate to={"/sign-up"} replace/>} />
+        <Route path="/" element={token?<ChatPage />:<Navigate to={"/sign-up"} />} />
+        <Route path="/sign-up" element={!token?<SignUp />:<Navigate to={"/chat"} />} />
+        <Route path="/login" element={!token?<Login />:<Navigate to={"/chat"} />} />
+        <Route path="/sign-in" element={!token?<Login />:<Navigate to={"/chat"} />} />
+        <Route path="/chat" element={token?<ChatPage />:<Navigate to={"/sign-up"} />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login"  />} />
       </Routes>
   )
 }
