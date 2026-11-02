@@ -57,7 +57,7 @@ export default function ChatPage() {
           <div className='header-logo'><img src='/logo.png' width={60} height={60}/> Julia</div>
           
           
-           <button className='user'>{user?.first_name?.charAt(0).toUpperCase()}</button></header>
+           <button className='user-avatar'>{user?.first_name?.charAt(0).toUpperCase()}</button></header>
         <section className="chat-content" aria-label="Chat conversation">
           {messages.length === 0 ? (
             <div className="empty-state">
