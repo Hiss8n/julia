@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuthStore } from './store/authStore';
+import { Link, useNavigate } from 'react-router-dom';
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -12,11 +13,39 @@ export default function ChatPage() {
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
+  const accountMenuRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const logout = useAuthStore(state => state.logout)
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [messages, loading])
+
+  useEffect(() => {
+    if (!accountMenuOpen) return
+
+    function closeMenu(event: MouseEvent | KeyboardEvent) {
+      if (event instanceof KeyboardEvent && event.key === 'Escape') {
+        setAccountMenuOpen(false)
+      } else if (event instanceof MouseEvent && !accountMenuRef.current?.contains(event.target as Node)) {
+        setAccountMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', closeMenu)
+    document.addEventListener('keydown', closeMenu)
+    return () => {
+      document.removeEventListener('mousedown', closeMenu)
+      document.removeEventListener('keydown', closeMenu)
+    }
+  }, [accountMenuOpen])
+
+  function handleLogout() {
+    logout()
+    navigate('/sign-up', { replace: true })
+  }
 
   async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -54,10 +83,34 @@ export default function ChatPage() {
     <div className="chat-layout">
       <main className="chat-page">
         <header className="chat-header">
-          <div className='header-logo'><img src='/logo.png' width={60} height={60}/> Julia</div>
+          <div className='header-logo'>
+            <Link to={"/home"} className='header-logo'><img src='/logo.png' width={60} height={60}/> Julia</Link>
+            
+            </div>
           
           
-           <button className='user-avatar'>{user?.first_name?.charAt(0).toUpperCase()}</button></header>
+          <div className="account-menu" ref={accountMenuRef}>
+            <button
+              className="user-avatar"
+              type="button"
+              aria-label="Open account menu"
+              aria-haspopup="menu"
+              aria-expanded={accountMenuOpen}
+              onClick={() => setAccountMenuOpen((open) => !open)}
+            >
+              {user?.first_name?.charAt(0).toUpperCase() ?? '?'}
+            </button>
+            {accountMenuOpen && <div className="account-dropdown" role="menu">
+              <span className="account-dropdown-label">ACCOUNT</span>
+              <Link to="/posts/new" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                <span className="account-menu-icon" aria-hidden="true">＋</span> Post news
+              </Link>
+              <button type="button" role="menuitem" onClick={handleLogout}>
+                <span className="account-menu-icon" aria-hidden="true">↪</span> Log out
+              </button>
+            </div>}
+          </div>
+        </header>
         <section className="chat-content" aria-label="Chat conversation">
           {messages.length === 0 ? (
             <div className="empty-state">

@@ -45,7 +45,7 @@ export default function SignUp() {
 	return (
 		<main className="login-shell">
 			<section className="login-brand-panel" aria-label="Julia">
-				<Link className="login-brand" to="/login" aria-label="Julia home">
+				<Link className="login-brand" to="/home" aria-label="Julia home">
 					<img src="/logo.png" alt="" />
 					<span>Julia</span>
 				</Link>

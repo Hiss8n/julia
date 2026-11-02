@@ -1,0 +1,131 @@
+import { useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { saveBulletinPost, type BulletinPost } from './home'
+
+const organizations = ['Community update', 'NRC', 'IRC', 'UNHCR', 'DRS', 'DRC', 'Don Bosco', 'WFP']
+
+export default function ComposePostPage() {
+  const [organization, setOrganization] = useState(organizations[0])
+  const [category, setCategory] = useState('Community news')
+  const [title, setTitle] = useState('')
+  const [summary, setSummary] = useState('')
+  const [image, setImage] = useState('')
+  const [body, setBody] = useState('')
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
+
+  async function submitPost(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+
+    if (pdfFile && (pdfFile.type !== 'application/pdf' || pdfFile.size > 2 * 1024 * 1024)) {
+      setError('Choose a PDF file no larger than 2 MB.')
+      return
+    }
+
+    let attachment: BulletinPost['attachment']
+    if (pdfFile) {
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Could not read the PDF'))
+          reader.onerror = () => reject(new Error('Could not read the PDF'))
+          reader.readAsDataURL(pdfFile)
+        })
+        attachment = { name: pdfFile.name, dataUrl }
+      } catch {
+        setError('The PDF could not be read. Please choose it again.')
+        return
+      }
+    }
+
+    const paragraphs = body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean)
+    const initials = organization === 'Community update'
+      ? 'C'
+      : organization === 'Don Bosco'
+        ? 'DB'
+        : organization.slice(0, 1)
+    const post: BulletinPost = {
+      id: `community-${crypto.randomUUID()}`,
+      organization: organization === 'Community update' ? 'Community' : organization,
+      initials,
+      category: category.trim(),
+      title: title.trim(),
+      summary: summary.trim(),
+      published: 'Just now',
+      image: image.trim() || 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1400&q=85',
+      imageAlt: 'Community members meeting together',
+      paragraphs,
+      isCommunityPost: true,
+      attachment,
+    }
+
+    try {
+      saveBulletinPost(post)
+      navigate(`/posts/${post.id}`)
+    } catch {
+      setError('This post could not be saved in this browser. Check available storage and try again.')
+    }
+  }
+
+  return <div className="bulletin-shell compose-shell">
+    <div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY BULLETIN</span><span>SHARE A LOCAL UPDATE</span></div>
+    <header className="bulletin-header">
+      <Link className="bulletin-brand" to="/home" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link>
+      <div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
+      <nav className="bulletin-actions" aria-label="Main navigation"><Link to="/home">Cancel <span aria-hidden="true">×</span></Link></nav>
+    </header>
+
+    <main className="compose-main">
+      <Link className="back-to-bulletin" to="/home">← <span>Back to updates</span></Link>
+      <div className="compose-heading">
+        <p className="section-kicker">COMMUNITY CONTRIBUTION</p>
+        <h1>Share a news update</h1>
+        <p>Write a clear, useful update for people in Kakuma. Posts are community-submitted and are not verified by the organization selected below.</p>
+      </div>
+
+      <form className="compose-form" onSubmit={submitPost}>
+        <label className="compose-field">Organization or source
+          <select value={organization} onChange={(event) => setOrganization(event.target.value)}>
+            {organizations.map((name) => <option key={name} value={name}>{name}</option>)}
+          </select>
+          <span className="compose-hint">Selecting an organization does not imply its endorsement.</span>
+        </label>
+        <label className="compose-field">Topic
+          <input value={category} onChange={(event) => setCategory(event.target.value)} maxLength={60} required />
+        </label>
+        <label className="compose-field">Headline
+          <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} placeholder="What should readers know?" required />
+          <span className="compose-hint">Keep it specific and easy to understand.</span>
+        </label>
+        <label className="compose-field">Short description
+          <textarea value={summary} onChange={(event) => setSummary(event.target.value)} maxLength={240} rows={3} placeholder="Summarize the update in a sentence or two." required />
+        </label>
+        <label className="compose-field">Full update
+          <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={8} placeholder="Add details, dates, locations and useful next steps. Separate paragraphs with a blank line." required />
+        </label>
+        <label className="compose-field">Image URL <span className="compose-optional">OPTIONAL</span>
+          <input type="url" value={image} onChange={(event) => setImage(event.target.value)} placeholder="https://..." />
+          <span className="compose-hint">Use an image you have permission to share. A bulletin image is used if left blank.</span>
+        </label>
+        <label className="compose-field compose-pdf-field">Attach a PDF <span className="compose-optional">OPTIONAL</span>
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            onChange={(event) => {
+              setPdfFile(event.target.files?.[0] ?? null)
+              setError('')
+            }}
+          />
+          <span className="compose-hint">PDF only, up to 2 MB. The document will be available from the published post.</span>
+          {pdfFile && <span className="compose-file-name">Selected: {pdfFile.name} <button type="button" onClick={() => setPdfFile(null)}>Remove</button></span>}
+        </label>
+        <p className="compose-disclaimer">Do not include private personal details, passwords, payment requests or unverified assistance schedules.</p>
+        {error && <p className="compose-error" role="alert">{error}</p>}
+        <div className="compose-actions"><Link to="/home">Cancel</Link><button type="submit">Publish update <span aria-hidden="true">→</span></button></div>
+      </form>
+    </main>
+    <footer className="bulletin-footer"><Link className="bulletin-brand" to="/home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Community-submitted updates are not official organization announcements.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
+  </div>
+}
