@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useAuthStore } from './store/authStore';
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -7,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
+  const user=useAuthStore(state=>state.user)
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -52,9 +54,10 @@ export default function ChatPage() {
     <div className="chat-layout">
       <main className="chat-page">
         <header className="chat-header">
-          <img src='/logo.png' width={60} height={60}/>
+          <div className='header-logo'><img src='/logo.png' width={60} height={60}/> Julia</div>
           
-          Julia </header>
+          
+           <button className='user'>{user?.first_name?.charAt(0).toUpperCase()}</button></header>
         <section className="chat-content" aria-label="Chat conversation">
           {messages.length === 0 ? (
             <div className="empty-state">
