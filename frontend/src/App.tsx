@@ -8,6 +8,7 @@ import SignUp from './components/sign-up'
 import HomePage from './pages/home'
 import PostPage from './pages/postId'
 import ComposePostPage from './pages/composePost'
+import OrganizationPage from './pages/organisation'
 import { useAuthStore } from './store/authStore'
 import './index.css'
 
@@ -32,10 +33,12 @@ export default function App() {
 
   return (
       <Routes>
-        <Route path="/" element={token?<HomePage />:<Navigate to={"/sign-up"} />} />
-        <Route path="/home" element={token?<HomePage />:<Navigate to={"/sign-up"} />} />
-        <Route path="/posts/:postId" element={token?<PostPage />:<Navigate to={"/sign-up"} />} />
-        <Route path="/posts/new" element={token?<ComposePostPage />:<Navigate to={"/sign-up"} />} />
+        <Route path="/" element={<OrganizationPage />} />
+        <Route path="/organisation" element={<OrganizationPage />} />
+        <Route path="/organization" element={<OrganizationPage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/posts/:postId" element={<PostPage />} />
+        <Route path="/posts/new" element={<ComposePostPage />} />
         <Route path="/sign-up" element={!token?<SignUp />:<Navigate to={"/chat"} />} />
         <Route path="/login" element={!token?<Login />:<Navigate to={"/chat"} />} />
         <Route path="/sign-in" element={!token?<Login />:<Navigate to={"/chat"} />} />

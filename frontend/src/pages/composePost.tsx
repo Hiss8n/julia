@@ -1,11 +1,9 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { saveBulletinPost, type BulletinPost } from './home'
-
-const organizations = ['Community update', 'NRC', 'IRC', 'UNHCR', 'DRS', 'DRC', 'Don Bosco', 'WFP']
+import { getAccountProfile } from '../store/organisationStore'
 
 export default function ComposePostPage() {
-  const [organization, setOrganization] = useState(organizations[0])
   const [category, setCategory] = useState('Community news')
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
@@ -14,6 +12,8 @@ export default function ComposePostPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const profile = getAccountProfile()
+  const organizationProfile = profile?.role === 'organization' ? profile.organization : null
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -41,14 +41,12 @@ export default function ComposePostPage() {
     }
 
     const paragraphs = body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean)
-    const initials = organization === 'Community update'
-      ? 'C'
-      : organization === 'Don Bosco'
-        ? 'DB'
-        : organization.slice(0, 1)
+    if (profile?.role !== 'organization') return
+    const organization = profile.organization.name
+    const initials = organization.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
     const post: BulletinPost = {
       id: `community-${crypto.randomUUID()}`,
-      organization: organization === 'Community update' ? 'Community' : organization,
+      organization,
       initials,
       category: category.trim(),
       title: title.trim(),
@@ -57,7 +55,7 @@ export default function ComposePostPage() {
       image: image.trim() || 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1400&q=85',
       imageAlt: 'Community members meeting together',
       paragraphs,
-      isCommunityPost: true,
+      isOrganizationPost: true,
       attachment,
     }
 
@@ -68,6 +66,8 @@ export default function ComposePostPage() {
       setError('This post could not be saved in this browser. Check available storage and try again.')
     }
   }
+
+    if (!organizationProfile) return <Navigate to="/home" replace />
 
   return <div className="bulletin-shell compose-shell">
     <div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY BULLETIN</span><span>SHARE A LOCAL UPDATE</span></div>
@@ -80,18 +80,13 @@ export default function ComposePostPage() {
     <main className="compose-main">
       <Link className="back-to-bulletin" to="/home">← <span>Back to updates</span></Link>
       <div className="compose-heading">
-        <p className="section-kicker">COMMUNITY CONTRIBUTION</p>
-        <h1>Share a news update</h1>
-        <p>Write a clear, useful update for people in Kakuma. Posts are community-submitted and are not verified by the organization selected below.</p>
+        <p className="section-kicker">{organizationProfile?.name.toUpperCase()}</p>
+        <h1>Share an organization update</h1>
+        <p>Publish a clear, useful update for people in Kakuma. Your organization name will appear as the source.</p>
       </div>
 
       <form className="compose-form" onSubmit={submitPost}>
-        <label className="compose-field">Organization or source
-          <select value={organization} onChange={(event) => setOrganization(event.target.value)}>
-            {organizations.map((name) => <option key={name} value={name}>{name}</option>)}
-          </select>
-          <span className="compose-hint">Selecting an organization does not imply its endorsement.</span>
-        </label>
+        <p className="compose-org-source">Posting as <strong>{organizationProfile?.name}</strong></p>
         <label className="compose-field">Topic
           <input value={category} onChange={(event) => setCategory(event.target.value)} maxLength={60} required />
         </label>
@@ -126,6 +121,6 @@ export default function ComposePostPage() {
         <div className="compose-actions"><Link to="/home">Cancel</Link><button type="submit">Publish update <span aria-hidden="true">→</span></button></div>
       </form>
     </main>
-    <footer className="bulletin-footer"><Link className="bulletin-brand" to="/home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Community-submitted updates are not official organization announcements.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
+    <footer className="bulletin-footer"><Link className="bulletin-brand" to="/home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Organization updates are shared directly by their registered profiles.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
   </div>
 }

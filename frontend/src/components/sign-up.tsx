@@ -34,7 +34,7 @@ export default function SignUp() {
 		setNotice('')
 		if (await register(userData)){
 			alert("user logging In...")
-			navigate('/chat', { replace: true })
+			navigate('/organisation', { replace: true })
 
 
 		} else{

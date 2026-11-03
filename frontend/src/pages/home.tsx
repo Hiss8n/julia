@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getAccountProfile } from '../store/organisationStore'
 
 export type BulletinPost = {
 	id: string
@@ -14,6 +15,7 @@ export type BulletinPost = {
 	imageAlt: string
 	paragraphs: string[]
 	isCommunityPost?: boolean
+	isOrganizationPost?: boolean
 	attachment?: {
 		name: string
 		dataUrl: string
@@ -161,6 +163,7 @@ export function OrganizationMark({ post }: { post: BulletinPost }) {
 export default function HomePage() {
 	const [organization, setOrganization] = useState('All organizations')
 	const [query, setQuery] = useState('')
+	const profile = getAccountProfile()
 	const allPosts = getBulletinPosts()
 	const featuredPost = allPosts[0]
 	const showFeature = organization === 'All organizations' && query.trim() === ''
@@ -177,6 +180,9 @@ export default function HomePage() {
 				<Link className="bulletin-brand" to="/home" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /> <span>Julia<span className="brand-period">.</span></span></Link>
 				<div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
 				<nav className="bulletin-actions" aria-label="Main navigation">
+					{profile?.role === 'organization'
+						? <Link to="/posts/new">Post <span aria-hidden="true">+</span></Link>
+						: <Link to="/organisation">Register organization <span aria-hidden="true">↗</span></Link>}
 					<Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link>
 				</nav>
 			</header>
@@ -201,7 +207,7 @@ export default function HomePage() {
 						<p className="lead-label">FEATURED UPDATE</p>
 						<h2><Link to={`/posts/${featuredPost.id}`}>{featuredPost.title}</Link></h2>
 						<p className="lead-summary">{featuredPost.summary}</p>
-						<div className="story-byline"><span>{featuredPost.published}</span><span>{featuredPost.isCommunityPost ? 'Community post' : 'Sample post'}</span></div>
+						<div className="story-byline"><span>{featuredPost.published}</span><span>{featuredPost.isOrganizationPost ? 'Organization post' : featuredPost.isCommunityPost ? 'Community post' : 'Sample post'}</span></div>
 						<Link className="read-story" to={`/posts/${featuredPost.id}`}>Read the full update <span aria-hidden="true">→</span></Link>
 					</div>
 				</section>}

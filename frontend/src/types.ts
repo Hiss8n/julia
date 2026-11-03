@@ -5,7 +5,16 @@ export type AuthUser = {
 	email: string
 }
 
-
+export type OrganizationDetails = {
+	name: string
+	type: string
+	description: string
+	location: string
+	website: string
+	phone: string
+	email: string
+	logo: string
+}
 
 
 export type AuthResponse = {
