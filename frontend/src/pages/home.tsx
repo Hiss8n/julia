@@ -1,26 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getAccountProfile } from '../store/organisationStore'
-
-export type BulletinPost = {
-	id: string
-	organization: string
-	initials: string
-	category: string
-	title: string
-	summary: string
-	published: string
-	image: string
-	imageAlt: string
-	paragraphs: string[]
-	isCommunityPost?: boolean
-	isOrganizationPost?: boolean
-	attachment?: {
-		name: string
-		dataUrl: string
-	}
-}
+import type { BulletinPost } from '../types'
 
 const COMMUNITY_POSTS_KEY = 'julia_community_posts'
 
@@ -31,6 +12,7 @@ export function getBulletinPosts(): BulletinPost[] {
 	} catch {
 		return posts
 	}
+	
 	return posts
 }
 
@@ -161,9 +143,9 @@ export function OrganizationMark({ post }: { post: BulletinPost }) {
 }
 
 export default function HomePage() {
+	const isAdmin=true
 	const [organization, setOrganization] = useState('All organizations')
 	const [query, setQuery] = useState('')
-	const profile = getAccountProfile()
 	const allPosts = getBulletinPosts()
 	const featuredPost = allPosts[0]
 	const showFeature = organization === 'All organizations' && query.trim() === ''
@@ -180,9 +162,11 @@ export default function HomePage() {
 				<Link className="bulletin-brand" to="/home" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /> <span>Julia<span className="brand-period">.</span></span></Link>
 				<div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
 				<nav className="bulletin-actions" aria-label="Main navigation">
-					{profile?.role === 'organization'
-						? <Link to="/posts/new">Post <span aria-hidden="true">+</span></Link>
-						: <Link to="/organisation">Register organization <span aria-hidden="true">↗</span></Link>}
+					{isAdmin
+					? <Link to="/posts/new">Post <span aria-hidden="true">+</span></Link>
+					:<Link to="/organisation">Register organization <span aria-hidden="true">↗</span></Link>}
+						
+						
 					<Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link>
 				</nav>
 			</header>

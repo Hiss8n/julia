@@ -13,9 +13,28 @@ export type OrganizationDetails = {
 	website: string
 	phone: string
 	email: string
-	logo: string
+	logo: string,
+	admin:string | null | undefined
 }
 
+export type BulletinPost = {
+	id: string
+	organization: string
+	initials: string
+	category: string
+	title: string
+	summary: string
+	published: string
+	image: string
+	imageAlt: string
+	paragraphs: string[]
+	isCommunityPost?: boolean
+	isOrganizationPost?: boolean
+	attachment?: {
+		name: string
+		dataUrl: string
+	}
+}
 
 export type AuthResponse = {
 	access_token: string

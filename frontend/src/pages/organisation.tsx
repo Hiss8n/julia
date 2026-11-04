@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import type { OrganizationDetails } from '../types'
+import { useOrganizationStore } from '../store/organisationStore'
 
 
 const organizationTypes = ['NGO', 'Business', 'CBO', 'School', 'Company', 'Other']
@@ -15,6 +16,7 @@ const emptyOrganization: OrganizationDetails = {
 	phone: '',
 	email: '',
 	logo: '',
+    admin: '',
 }
 
 function readLogo(file: File) {
@@ -29,7 +31,11 @@ function readLogo(file: File) {
 export default function OrganizationPage() {
 	const navigate = useNavigate()
 	const user = useAuthStore((state) => state.user)
-	const [details, setDetails] = useState(emptyOrganization)
+	const saveOrganization = useOrganizationStore((state) => state.createOrganization)
+	const [details, setDetails] = useState<OrganizationDetails>(() => ({
+		...emptyOrganization,
+		admin: user?.first_name ?? '',
+	}))
 	const [logoFile, setLogoFile] = useState<File | null>(null)
 	const [error, setError] = useState('')
 
@@ -45,10 +51,10 @@ export default function OrganizationPage() {
 	async function createOrganization(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		setError('')
-		if (!user) {
+	/* 	if (!user) {
 			setError('You need an account to register an organization.')
 			return
-		}
+		} */
 		if (logoFile && (!logoFile.type.startsWith('image/') || logoFile.size > 1024 * 1024)) {
 			setError('Choose an image no larger than 1 MB for the organization logo.')
 			return
@@ -61,8 +67,16 @@ export default function OrganizationPage() {
 				userId: user?.id ?? null,
 				organizationDetails,
 			})
+			const response=await saveOrganization(organizationDetails)
+			if(!response){
+				alert("Cannot register your orgnisation now")
+			} else{
+				alert("created organisation page successfully")
+				console.log("org:",organizationDetails)
+				/* navigate('/home', { replace: true })  */
+			}
 	
-			navigate('/home', { replace: true })
+			
 		} catch {
 			setError('Your organization could not be saved. Check available storage and try again.')
 		}

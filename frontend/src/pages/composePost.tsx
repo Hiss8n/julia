@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { saveBulletinPost, type BulletinPost } from './home'
-import { getAccountProfile } from '../store/organisationStore'
-
+import { saveBulletinPost } from './home'
+import type { BulletinPost } from '../types'
 export default function ComposePostPage() {
   const [category, setCategory] = useState('Community news')
   const [title, setTitle] = useState('')
@@ -12,8 +11,8 @@ export default function ComposePostPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [error, setError] = useState('')
   const navigate = useNavigate()
-  const profile = getAccountProfile()
-  const organizationProfile = profile?.role === 'organization' ? profile.organization : null
+  const isAdmin = true
+
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -41,9 +40,9 @@ export default function ComposePostPage() {
     }
 
     const paragraphs = body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean)
-    if (profile?.role !== 'organization') return
-    const organization = profile.organization.name
-    const initials = organization.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
+    const organization = 'Sample Organization'
+    const initials = 'SO'
+
     const post: BulletinPost = {
       id: `community-${crypto.randomUUID()}`,
       organization,
@@ -67,7 +66,7 @@ export default function ComposePostPage() {
     }
   }
 
-    if (!organizationProfile) return <Navigate to="/home" replace />
+    if (!isAdmin) return <Navigate to="/home" replace />
 
   return <div className="bulletin-shell compose-shell">
     <div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY BULLETIN</span><span>SHARE A LOCAL UPDATE</span></div>
@@ -80,13 +79,13 @@ export default function ComposePostPage() {
     <main className="compose-main">
       <Link className="back-to-bulletin" to="/home">← <span>Back to updates</span></Link>
       <div className="compose-heading">
-        <p className="section-kicker">{organizationProfile?.name.toUpperCase()}</p>
+        <p className="section-kicker">Organisation Name</p>
         <h1>Share an organization update</h1>
         <p>Publish a clear, useful update for people in Kakuma. Your organization name will appear as the source.</p>
       </div>
 
       <form className="compose-form" onSubmit={submitPost}>
-        <p className="compose-org-source">Posting as <strong>{organizationProfile?.name}</strong></p>
+        <p className="compose-org-source">Posting as <strong>NRC</strong></p>
         <label className="compose-field">Topic
           <input value={category} onChange={(event) => setCategory(event.target.value)} maxLength={60} required />
         </label>

@@ -14,6 +14,7 @@ import httpx
 from api.auth.routes import router as auth_router
 from api.database import Base, engine
 from api import models  # noqa: F401
+from api.organisation.routes import router as organisation_router
 
 
 
@@ -59,6 +60,7 @@ collection =chroma_client.get_or_create_collection(
 
 app=FastAPI()
 app.include_router(auth_router)
+app.include_router(organisation_router)
 
 
 @app.on_event("startup")

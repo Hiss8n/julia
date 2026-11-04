@@ -5,7 +5,7 @@ import type { OrganizationDetails } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 
-type Organization = OrganizationDetails & {
+type  Organization = OrganizationDetails & {
     id: number
 }
 
@@ -47,7 +47,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     return data as T
 }
 
-export const useOrganizationStore = create<OrganizationState>((set,get) => ({
+export const useOrganizationStore = create<OrganizationState>((set) => ({
     organizations: [],
     currentOrganization: null,
     isLoading: false,

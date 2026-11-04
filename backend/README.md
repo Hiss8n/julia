@@ -26,12 +26,12 @@ The application reads these values when it starts. `COHERE`, `CHROMA_TENANT`, `C
 Authentication configuration:
 
 ```env
-DATABASE_URL=sqlite:///./julia.db
+DATABASE_URL=postgresql+psycopg://user:password@host:5432/database
 AUTH_SECRET_KEY=replace_with_a_long_random_secret
 ACCESS_TOKEN_MINUTES=60
 ```
 
-The database defaults to a local SQLite file. Set `DATABASE_URL` to a PostgreSQL SQLAlchemy URL for production (for example, `postgresql+psycopg://user:password@host:5432/database`). Set `AUTH_SECRET_KEY` to a strong, persistent random secret in every deployed environment; without it, a temporary key is generated at process startup and existing tokens become invalid after a restart. The `users` table is created on application startup.
+Configure `DATABASE_URL` with the PostgreSQL connection URL for local development and deployment. The `psycopg[binary]` driver is included in `requirements.txt`. Set `AUTH_SECRET_KEY` to a strong, persistent random secret in every environment; without it, a temporary key is generated at process startup and existing tokens become invalid after a restart. The `users` and `organisations` tables are created on application startup when they do not already exist. SQLAlchemy's `create_all` does not alter existing tables, so apply a database migration when changing an existing schema.
 
 ## Run Locally
 
@@ -144,7 +144,7 @@ The included `vercel.json` configures `api/main.py` as a Python serverless funct
 ### Vercel Dashboard
 
 1. Import the repository into Vercel and select the `backend` directory as the project root.
-2. In the project settings, add these environment variables for the deployments you plan to use: `COHERE`, `CHROMA_TENANT`, `CHROMA_DATABASE`, and `CHROMA_API_KEY`. Set `CHROMA_HOST` too if retaining the current configuration; it is read but currently unused.
+2. In the project settings, add these environment variables for the deployments you plan to use: `COHERE`, `CHROMA_TENANT`, `CHROMA_DATABASE`, `CHROMA_API_KEY`, `DATABASE_URL`, and `AUTH_SECRET_KEY`. Set `CHROMA_HOST` too if retaining the current configuration; it is read but currently unused.
 3. Keep the framework preset as **Other**. The Vercel Python builder uses `vercel.json` and `requirements.txt`; no separate build command is needed.
 4. Deploy the project. After deployment, check the deployment URL at `/` and open `/docs` to inspect the API.
 

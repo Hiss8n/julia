@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 import bcrypt
 import jwt
 from fastapi import HTTPException, status
-from jwt.exceptions import InvalidTokenError
-
+from jwt.exceptions import InvalidTokenError        
 load_dotenv()
 
 AUTH_SECRET_KEY = os.getenv("AUTH_SECRET_KEY") or secrets.token_urlsafe(32)
