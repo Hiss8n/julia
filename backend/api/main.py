@@ -89,10 +89,10 @@ class chatQuery(BaseModel):
 
 def ping_health_check():
     # Replace with your actual deployed URL or localhost URL
-    url = "https://julia-c2n3.vercel.app" 
+    url = "https://julia-pycq.onrender.com" 
     try:
         response = httpx.get(url)
-        print(f"Health check pinged: {response.status_code}")
+        print(f"Health check pinged,**UP RUNNING**: {response.status_code}")
     except Exception as e:
         print(f"Ping failed: {e}")
 
