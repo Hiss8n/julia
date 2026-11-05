@@ -9,7 +9,7 @@ from jwt.exceptions import InvalidTokenError
 load_dotenv()
 
 AUTH_SECRET_KEY = os.getenv("AUTH_SECRET_KEY") or secrets.token_urlsafe(32)
-ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", "7d"))
+ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", "10080"))
 JWT_ALGORITHM = "HS256"
 
 
