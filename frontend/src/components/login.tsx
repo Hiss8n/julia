@@ -31,8 +31,10 @@ export default function Login() {
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
 		setNotice('')
-		if (await login(userData)) navigate('/chat', { replace: true })
+		if (await login(userData)) navigate('/', { replace: true })
     }
+
+	/* useEffect(()=>{checkAuth()},[]) */
 
 	return (
 		<main className="login-shell">

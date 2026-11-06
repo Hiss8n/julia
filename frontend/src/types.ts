@@ -3,18 +3,28 @@ export type AuthUser = {
 	first_name: string
 	second_name: string
 	email: string
+	has_organisation: boolean
+}
+
+export type RegisterDetails = {
+	firstName: string
+	secondName: string
+	email: string
+	password: string
+	has_organisation: boolean
 }
 
 export type OrganizationDetails = {
-	name: string
-	type: string
-	description: string
-	location: string
-	website: string
-	phone: string
-	email: string
-	logo: string,
-	admin:string | null | undefined
+	organisation_name: string,
+	organisation_type: string,
+	organisation_description:string,
+	organisation_location:string,
+	organisation_website: string,
+	organisation_phone: string,
+	organisation_email:string,
+	organisation_logo: string,
+    organisation_admin: string,
+	organisation_password:string
 }
 
 export type BulletinPost = {
@@ -42,12 +52,7 @@ export type AuthResponse = {
 	user: AuthUser
 }
 
-export type RegisterDetails = {
-	firstName: string
-	secondName: string
-	email: string
-	password: string
-}
+
 
 export type LoginDetails = {
 	email: string
@@ -63,6 +68,6 @@ export type AuthState = {
 	error: string
 	register: (details: RegisterDetails) => Promise<boolean>
 	login: (details: LoginDetails) => Promise<boolean>
-	checkAuth: () => Promise<boolean>
+	checkAuth: () =>boolean
 	logout: () => void
 }

@@ -118,6 +118,12 @@ button, textarea { font: inherit; }
 .signup-field:not(.signup-email-field) + .signup-field { margin-top: 18px; }
 .signup-hint { margin-top: 7px; color: #858798; font-size: 11px; }
 .signup-submit { margin-top: 23px; }
+.signup-account-type { min-width: 0; margin: 24px 0 0; padding: 0; border: 0; }
+.signup-account-type legend { margin-bottom: 10px; color: #34334b; font-size: 13px; font-weight: 600; }
+.signup-account-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.signup-account-options button { min-height: 44px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font: 600 13px 'DM Sans', sans-serif; cursor: pointer; }
+.signup-account-options button.is-selected { border-color: #087f99; background: #e7f4f3; color: #075e71; box-shadow: inset 0 0 0 1px #087f99; }
+.signup-account-type > p { margin: 9px 0 0; color: #74778a; font-size: 12px; line-height: 1.5; }
 .signup-form .login-notice { margin-top: 10px; }
 .signup-form-wrap .login-signup { margin-top: 20px; }
 .signup-form-wrap .login-privacy { margin-top: 30px; }
@@ -194,20 +200,52 @@ button, textarea { font: inherit; }
 .compose-pdf-field input[type="file"] { padding: 9px; background: #eeede6; font-size: 11px; }
 .compose-file-name { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #35434a; font-size: 11px; font-weight: 500; overflow-wrap: anywhere; }
 .compose-file-name button { flex: 0 0 auto; border: 0; padding: 4px 0; background: transparent; color: #a63e34; font-size: 10px; font-weight: 700; cursor: pointer; }
+.org-account-page { min-height: 100vh; display: grid; place-items: center; padding: 52px 24px; background: radial-gradient(ellipse at 12% 8%, #d7eff0 0, transparent 34%), #f1f0eb; color: #20313a; }
+.org-account-panel { width: min(100%, 820px); padding: clamp(26px, 5vw, 52px); border: 1px solid #d5d3c9; border-top: 4px solid #087f99; background: #fffefa; box-shadow: 0 20px 60px #20313a12; animation: login-arrive .4s ease-out both; }
+.org-account-heading { max-width: 620px; margin-bottom: 32px; }
+.org-account-eyebrow { margin: 0 0 12px; color: #a94237; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.org-account-heading h1 { margin: 0 0 10px; color: #20313a; font: 600 32px/1.18 'Manrope', sans-serif; }
+.org-account-heading > p:last-child { margin: 0; color: #626d70; font-size: 14px; line-height: 1.65; }
 .org-onboarding-main { width: min(940px, calc(100% - 48px)); min-height: calc(100vh - 220px); margin: 0 auto; padding: 48px 0 76px; }
+.org-directory-main { width: min(940px, calc(100% - 48px)); min-height: calc(100vh - 220px); margin: 0 auto; padding: 52px 0 76px; }
+.org-directory-heading { max-width: 680px; margin-bottom: 34px; }
+.org-directory-heading h1 { margin: 0 0 12px; color: #20313a; font: 600 36px/1.12 'Manrope', sans-serif; }
+.org-directory-heading > p:last-child { margin: 0; color: #626d70; font-size: 14px; line-height: 1.65; }
+.org-directory-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 34px; margin: 0; padding: 0; list-style: none; border-top: 1px solid #d5d3c9; }
+.org-directory-item { min-width: 0; display: flex; gap: 16px; padding: 24px 0; border-bottom: 1px solid #d5d3c9; }
+.org-directory-mark { flex: 0 0 42px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: #e5eeeb; color: #176875; font-weight: 700; }
+.org-directory-copy { min-width: 0; }
+.org-directory-copy .section-kicker { margin: 0 0 8px; }
+.org-directory-copy h2 { margin: 0 0 8px; color: #20313a; font: 600 19px/1.3 'Manrope', sans-serif; }
+.org-directory-copy > p:not(.section-kicker) { margin: 0; color: #626d70; font-size: 13px; line-height: 1.6; }
+.org-directory-copy > a { display: inline-block; margin-top: 12px; color: #087f99; font-size: 12px; font-weight: 700; text-decoration: none; }
+.org-directory-state { padding: 18px 0; color: #626d70; font-size: 14px; }
+.org-current-dashboard { margin-bottom: 36px; border-top: 1px solid #d5d3c9; border-bottom: 1px solid #d5d3c9; padding: 20px 0 24px; }
+.org-current-dashboard > .section-kicker { margin: 0 0 16px; }
+.org-current-profile { display: flex; align-items: flex-start; gap: 18px; }
+.org-current-logo { flex: 0 0 64px; width: 64px; height: 64px; border-radius: 3px; object-fit: cover; }
+.org-current-contacts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; }
+.org-current-contacts a { color: #087f99; font-size: 12px; font-weight: 700; overflow-wrap: anywhere; text-decoration: none; }
 .org-onboarding-intro { max-width: 640px; margin-bottom: 30px; }
 .org-onboarding-intro h1 { margin: 0 0 12px; color: #20313a; font: 600 36px/1.12 'Manrope', sans-serif; }
 .org-onboarding-intro > p:last-child { max-width: 580px; margin: 0; color: #626d70; font-size: 14px; line-height: 1.65; }
 .org-skip-button { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; border: 0; padding: 10px 0; background: transparent; color: #a63e34; font: 700 16px 'DM Sans', sans-serif; text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .org-skip-button span { color: #586368; font-size: 12px; font-weight: 500; text-decoration: none; }
 .org-skip-button:hover { color: #20313a; }
-.org-registration-form { border-top: 2px solid #20313a; padding-top: 22px; }
+.org-registration-form { display: flex; flex-direction: column; gap: 20px; border-top: 1px solid #d5d3c9; padding-top: 24px; }
 .org-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; }
 .org-form-wide { grid-column: 1 / -1; }
+.org-registration-form .compose-field { gap: 8px; color: #35434a; font-size: 12px; }
+.org-registration-form .compose-field input, .org-registration-form .compose-field textarea, .org-registration-form .compose-field select { min-height: 44px; border-color: #c9c7bc; border-radius: 3px; background: #fff; transition: border-color .16s, box-shadow .16s; }
+.org-registration-form .compose-field textarea { min-height: 110px; }
+.org-registration-form .compose-field input:focus, .org-registration-form .compose-field textarea:focus, .org-registration-form .compose-field select:focus { border-color: #087f99; box-shadow: 0 0 0 3px #087f9918; }
 .org-registration-form .compose-field input[type="file"] { padding: 9px; background: #eeede6; font-size: 11px; }
-.org-form-actions { display: flex; justify-content: space-between; align-items: center; gap: 22px; margin-top: 24px; }
+.org-form-actions { display: flex; justify-content: space-between; align-items: center; gap: 22px; padding-top: 4px; }
+.org-form-actions .org-skip-button { color: #626d70; font-size: 13px; font-weight: 600; text-decoration: none; }
+.org-form-actions .org-skip-button:hover { color: #087f99; }
 .org-submit-button { min-height: 46px; display: inline-flex; align-items: center; gap: 16px; border: 0; padding: 0 18px; background: #20313a; color: #fff; font: 600 12px 'DM Sans', sans-serif; cursor: pointer; }
 .org-submit-button:hover { background: #304951; }
+.org-submit-button:disabled { opacity: .65; cursor: wait; }
 .org-submit-button span { color: #ff8475; font-size: 17px; }
 .compose-org-source { margin: -4px 0 0; padding: 10px 12px; border-left: 3px solid #b4473b; background: #eeede6; color: #626d70; font-size: 11px; }
 .compose-org-source strong { color: #20313a; }
@@ -219,7 +257,14 @@ button, textarea { font: inherit; }
 .attachment-copy span { color: #737b77; font-size: 9px; }
 .attachment-download { color: #a94237; font-size: 20px; }
 @media (max-width: 760px) {
+  .org-account-page { place-items: start center; padding: 24px 16px; }
+  .org-account-panel { padding: 26px 20px; }
+  .org-account-heading { margin-bottom: 25px; }
+  .org-account-heading h1 { font-size: 27px; }
   .org-onboarding-main { width: calc(100% - 36px); min-height: calc(100vh - 200px); padding: 32px 0 52px; }
+  .org-directory-main { width: calc(100% - 36px); min-height: calc(100vh - 200px); padding: 34px 0 52px; }
+  .org-directory-heading h1 { font-size: 29px; }
+  .org-directory-list { grid-template-columns: 1fr; }
   .org-onboarding-intro h1 { font-size: 29px; }
   .org-form-grid { grid-template-columns: 1fr; }
   .org-form-wide { grid-column: auto; }

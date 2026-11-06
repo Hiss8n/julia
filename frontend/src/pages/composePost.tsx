@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { saveBulletinPost } from './home'
 import type { BulletinPost } from '../types'
+import { useAuthStore } from '../store/authStore'
 export default function ComposePostPage() {
   const [category, setCategory] = useState('Community news')
   const [title, setTitle] = useState('')
@@ -11,7 +12,7 @@ export default function ComposePostPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [error, setError] = useState('')
   const navigate = useNavigate()
-  const isAdmin = true
+  const isAdmin = useAuthStore((state) => Boolean(state.user?.has_organisation))
 
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
@@ -66,7 +67,7 @@ export default function ComposePostPage() {
     }
   }
 
-    if (!isAdmin) return <Navigate to="/home" replace />
+    if (!isAdmin) return <Navigate to="/organizations" replace />
 
   return <div className="bulletin-shell compose-shell">
     <div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY BULLETIN</span><span>SHARE A LOCAL UPDATE</span></div>

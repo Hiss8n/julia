@@ -1,5 +1,4 @@
-
-import { useEffect} from 'react'
+import { useEffect, type ReactNode} from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ChatPage from './ChatPage'
 import Admin from './components/admin'
@@ -8,43 +7,43 @@ import SignUp from './components/sign-up'
 import HomePage from './pages/home'
 import PostPage from './pages/postId'
 import ComposePostPage from './pages/composePost'
-import OrganizationPage from './pages/organisation'
+import OrganisationPage from './pages/createOrganisationPage'
 import { useAuthStore } from './store/authStore'
 import './index.css'
+import OrganizationsPage from './pages/organizations'
 
-/*  function ProtectedRoute({ children }: { children: ReactNode }) {
-   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth) 
-  const token = useAuthStore((state) => state.token)
-
-  if ( !token) return <main className="login-shell" aria-live="polite">Checking your session…</main>
-  return token? children : <Navigate to="/login" replace />
-} */
  
 export default function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth)
   const token = useAuthStore((state) => state.token)
+  const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth)
 
-  console.log("tok:",token)
+
 
   useEffect(() => {
-    void checkAuth()
+     void checkAuth()
   }, [checkAuth])
+
+  if (isCheckingAuth) return <main className="login-shell" aria-live="polite">Checking your session…</main>
+
+  const isAuthenticated = Boolean(token)
+  const protectedPage = (page: ReactNode) =>
+    isAuthenticated ? page : <Navigate to="/login" replace />
+  const authPage = (page: ReactNode) =>
+    isAuthenticated ? <Navigate to="/home" replace /> : page
 
   return (
       <Routes>
-        <Route path="/" element={<OrganizationPage />} />
-        <Route path="/organisation" element={<OrganizationPage />} />
-        <Route path="/organization" element={<OrganizationPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/posts/:postId" element={<PostPage />} />
-        <Route path="/posts/new" element={<ComposePostPage />} />
-        <Route path="/sign-up" element={!token?<SignUp />:<Navigate to={"/chat"} />} />
-        <Route path="/login" element={!token?<Login />:<Navigate to={"/chat"} />} />
-        <Route path="/sign-in" element={!token?<Login />:<Navigate to={"/chat"} />} />
-        <Route path="/chat" element={token?<ChatPage />:<Navigate to={"/sign-up"} />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="*" element={<Navigate to="/login"  />} />
+        <Route path="/" element={protectedPage(<HomePage />)} />
+        <Route path="/organisation" element={authPage(<OrganisationPage />)} />
+        <Route path="/organizations" element={protectedPage(<OrganizationsPage />)} />
+        <Route path="/sign-up" element={authPage(<SignUp />)} />
+        <Route path="/login" element={authPage(<Login />)} />
+        <Route path="/posts/:postId" element={protectedPage(<PostPage />)} />
+        <Route path="/posts/new" element={protectedPage(<ComposePostPage />)} />
+        <Route path="/admin" element={protectedPage(<Admin />)} />
+        <Route path="/chat" element={protectedPage(<ChatPage />)} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />} />
       </Routes>
   )
 }

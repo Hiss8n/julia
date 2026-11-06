@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AuthResponse, AuthState, AuthUser, LoginDetails, RegisterDetails } from '../types'
+import type { AuthResponse, AuthState, LoginDetails, RegisterDetails } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 const TOKEN_KEY = 'julia_access_token'
@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	isLoading: false,
 	error: '',
 
-	register: async ({ firstName, secondName, email, password }: RegisterDetails) => {
+	register: async ({ firstName, secondName, email, password, has_organisation }: RegisterDetails) => {
 		set({ isLoading: true, error: '' })
 		try {
 			const data = await request<AuthResponse>('/auth/register', {
@@ -59,9 +59,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 					second_name: secondName,
 					email,
 					password,
+					has_organisation,
 				}),
 			})
-		saveSession(set, data)
+			saveSession(set, data)
+			console.log("user:",data)
 			return true
 		} catch (error) {
 			set({ error: error instanceof Error ? error.message : 'Could not create account' })
@@ -88,19 +90,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		}
 	},
 
-	checkAuth: async () => {
-		const token = get().token ?? localStorage.getItem(TOKEN_KEY)
-		if (!token) {
-			set({ user: null, token: null, isAuthenticated: false, isCheckingAuth: false })
-			return false
-		}
-
+	checkAuth:() => {
 		set({ isCheckingAuth: true })
 		try {
-			const user = await request<AuthUser>('/auth/me', {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-			set({ user, token, isAuthenticated: true, error: '' })
+			const token = get().token ?? localStorage.getItem(TOKEN_KEY)
+			
+			set({ token, isAuthenticated: true, error: '' })
 			return true
 		} catch (error) {
 			if (error instanceof ApiError && error.status === 401) {

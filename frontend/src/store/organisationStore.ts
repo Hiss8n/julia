@@ -78,16 +78,28 @@ export const useOrganizationStore = create<OrganizationState>((set) => ({
     },
 
     createOrganization: async (details) => {
+        
         set({ isLoading: true, error: null })
         try {
             const organization = await request<Organization>('/organizations/create', {
                 method: 'POST',
-                body: JSON.stringify(details),
+                body: JSON.stringify({
+                    name: details.organisation_name,
+                    type: details.organisation_type,
+                    description: details.organisation_description,
+                    location: details.organisation_location,
+                    website: details.organisation_website,
+                    phone: details.organisation_phone,
+                    email: details.organisation_email,
+                    logo: details.organisation_logo,
+                    admin: details.organisation_admin,
+                }),
             })
             set((state) => ({
                 organizations: [...state.organizations, organization],
                 currentOrganization: organization,
             }))
+            console.log("org:",organization)
             return organization
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Could not create organization'

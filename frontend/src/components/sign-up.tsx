@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-
-type SignUpFormData = {
-	firstName: string
-	secondName: string
-	email: string
-	password: string
-}
+import type { RegisterDetails } from '../types'
 
 export default function SignUp() {
 	const navigate = useNavigate()
@@ -16,36 +10,44 @@ export default function SignUp() {
 	const authError = useAuthStore((state) => state.error)
 	const [passwordVisible, setPasswordVisible] = useState(false)
 	const [notice, setNotice] = useState('')
-	const [userData, setUserData] = useState<SignUpFormData>({
+	const [accountType, setAccountType] = useState<'individual' | 'organisation'>('individual')
+	const [userData, setUserData] = useState<RegisterDetails>({
 		firstName: '',
 		secondName: '',
 		email: '',
 		password: '',
+		has_organisation: false,
 	})
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
 		const { name, value } = event.currentTarget
-		const field = name as keyof SignUpFormData
+		const field = name as keyof RegisterDetails
 		setUserData((current) => ({ ...current, [field]: value }))
+	}
+
+	function handleAccountTypeChange(type: 'individual' | 'organisation') {
+		setAccountType(type)
+		setUserData((current) => ({ ...current, has_organisation: type === 'organisation' }))
 	}
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		setNotice('')
-		if (await register(userData)){
-			alert("user logging In...")
-			navigate('/organisation', { replace: true })
-
-
-		} else{
-			alert("error loging")
+		const registrationData: RegisterDetails = {
+			...userData,
+			has_organisation: accountType === 'organisation',
 		}
+		if (accountType === 'organisation') {
+			navigate('/organisation', { state: { registrationData } })
+			return
+		}
+		if (await register(registrationData)) navigate('/', { replace: true })
 	}
 
 	return (
 		<main className="login-shell">
 			<section className="login-brand-panel" aria-label="Julia">
-				<Link className="login-brand" to="/home" aria-label="Julia home">
+				<Link className="login-brand" to="/" aria-label="Julia home">
 					<img src="/logo.png" alt="" />
 					<span>Julia</span>
 				</Link>
@@ -139,8 +141,17 @@ export default function SignUp() {
 							<span className="signup-hint">Use at least 8 characters.</span>
 						</div>
 
+						<fieldset className="signup-account-type">
+							<legend>Sign up as</legend>
+							<div className="signup-account-options">
+								<button type="button" aria-pressed={accountType === 'individual'} className={accountType === 'individual' ? 'is-selected' : ''} onClick={() => handleAccountTypeChange('individual')}>Individual</button>
+								<button type="button" aria-pressed={accountType === 'organisation'} className={accountType === 'organisation' ? 'is-selected' : ''} onClick={() => handleAccountTypeChange('organisation')}>Organisation</button>
+							</div>
+							<p>{accountType === 'organisation' ? 'Next, add your organisation details before creating your account.' : 'Browse organisations and chat with Julia after creating your account.'}</p>
+						</fieldset>
+
 						<button className="login-submit signup-submit" type="submit" disabled={isLoading}>
-							{isLoading ? 'Creating account…' : 'Create account'} <span aria-hidden="true">&#8594;</span>
+							{isLoading ? 'Creating account…' : accountType === 'organisation' ? 'Continue to organisation setup' : 'Create Account'} <span aria-hidden="true">&#8594;</span>
 						</button>
 						<p className="login-notice" role="status" aria-live="polite">{authError || notice}</p>
 					</form>

@@ -1,7 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import type { BulletinPost } from '../types'
+import { useAuthStore } from '../store/authStore'
 
 const COMMUNITY_POSTS_KEY = 'julia_community_posts'
 
@@ -143,9 +144,10 @@ export function OrganizationMark({ post }: { post: BulletinPost }) {
 }
 
 export default function HomePage() {
-	const isAdmin=true
+	const user = useAuthStore((state) => state.user)
 	const [organization, setOrganization] = useState('All organizations')
 	const [query, setQuery] = useState('')
+	if (user && !user.has_organisation) return <Navigate to="/organizations" replace />
 	const allPosts = getBulletinPosts()
 	const featuredPost = allPosts[0]
 	const showFeature = organization === 'All organizations' && query.trim() === ''
@@ -162,9 +164,9 @@ export default function HomePage() {
 				<Link className="bulletin-brand" to="/home" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /> <span>Julia<span className="brand-period">.</span></span></Link>
 				<div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
 				<nav className="bulletin-actions" aria-label="Main navigation">
-					{isAdmin
+					{user?.has_organisation
 					? <Link to="/posts/new">Post <span aria-hidden="true">+</span></Link>
-					:<Link to="/organisation">Register organization <span aria-hidden="true">↗</span></Link>}
+					:<Link to="/organizations">Browse organizations <span aria-hidden="true">↗</span></Link>}
 						
 						
 					<Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link>

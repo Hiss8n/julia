@@ -17,6 +17,7 @@ def register_user(db: Session, request: RegisterRequest) -> User:
         second_name=request.second_name,
         email=str(request.email),
         password_hash=hash_password(request.password),
+        has_organisation=request.has_organisation
     )
     db.add(user)
     try:
