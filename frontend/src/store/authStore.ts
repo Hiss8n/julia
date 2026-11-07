@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { AuthResponse, AuthState, LoginDetails, RegisterDetails } from '../types'
+import type { AuthResponse, AuthState, AuthUser, LoginDetails, RegisterDetails } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 const TOKEN_KEY = 'julia_access_token'
@@ -90,19 +90,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 		}
 	},
 
-	checkAuth:() => {
+	checkAuth: async () => {
 		set({ isCheckingAuth: true })
+		const token = get().token ?? localStorage.getItem(TOKEN_KEY)
+		if (!token) {
+			set({ user: null, token: null, isAuthenticated: false, isCheckingAuth: false })
+			return false
+		}
+
 		try {
-			const token = get().token ?? localStorage.getItem(TOKEN_KEY)
-			
-			set({ token, isAuthenticated: true, error: '' })
+			const user = await request<AuthUser>('/auth/me', {
+				headers: { Authorization: `Bearer ${token}` },
+			})
+			set({ user, token, isAuthenticated: true, error: '' })
 			return true
 		} catch (error) {
 			if (error instanceof ApiError && error.status === 401) {
 				localStorage.removeItem(TOKEN_KEY)
-				set({ token: null })
+				set({ user: null, token: null, isAuthenticated: false })
+			} else {
+				set({ user: null, isAuthenticated: false })
 			}
-			set({ user: null, isAuthenticated: false })
 			return false
 		} finally {
 			set({ isCheckingAuth: false })

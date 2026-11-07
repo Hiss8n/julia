@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { saveBulletinPost } from './home'
+
 import type { BulletinPost } from '../types'
 import { useAuthStore } from '../store/authStore'
+import { usePostStore } from '../store/postStore'
 export default function ComposePostPage() {
   const [category, setCategory] = useState('Community news')
   const [title, setTitle] = useState('')
@@ -13,6 +14,7 @@ export default function ComposePostPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
   const isAdmin = useAuthStore((state) => Boolean(state.user?.has_organisation))
+  const createPost = usePostStore((state) => state.createPost)
 
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
@@ -43,7 +45,6 @@ export default function ComposePostPage() {
     const paragraphs = body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean)
     const organization = 'Sample Organization'
     const initials = 'SO'
-
     const post: BulletinPost = {
       id: `community-${crypto.randomUUID()}`,
       organization,
@@ -59,11 +60,15 @@ export default function ComposePostPage() {
       attachment,
     }
 
+
     try {
-      saveBulletinPost(post)
-      navigate(`/posts/${post.id}`)
+      console.log("post:",post)
+      const createdPost = await createPost(post)
+
+      console.log("post",createPost)
+      navigate(`/posts/${createdPost.id}`)
     } catch {
-      setError('This post could not be saved in this browser. Check available storage and try again.')
+      setError('This post could not be published. Please try again.')
     }
   }
 

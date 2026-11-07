@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, JSON, String, Text, func
 from sqlalchemy.orm import relationship
 
 from api.database import Base
@@ -32,4 +32,30 @@ class Organisation(Base):
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     owner = relationship("User", back_populates="organisation")
+    posts = relationship("Post", back_populates="organisation", cascade="all, delete-orphan")
+
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(String(100), primary_key=True)
+    organisation_id = Column(
+        Integer,
+        ForeignKey("organisations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    organization = Column(String(100), nullable=False)
+    initials = Column(String(20), nullable=False)
+    category = Column(String(100), nullable=False)
+    title = Column(String(200), nullable=False)
+    summary = Column(Text, nullable=False)
+    published = Column(String(100), nullable=False)
+    image = Column(Text, nullable=False)
+    image_alt = Column(Text, nullable=False)
+    paragraphs = Column(JSON, nullable=False, default=list)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    organisation = relationship("Organisation", back_populates="posts")
+	
    
+

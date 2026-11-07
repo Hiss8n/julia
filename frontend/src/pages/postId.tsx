@@ -1,10 +1,22 @@
 
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getBulletinPosts, OrganizationMark } from './home'
+import { usePostStore } from '../store/postStore'
+import { OrganizationMark } from './home'
 
 export default function PostPage() {
   const { postId } = useParams()
-  const post = getBulletinPosts().find((item) => item.id === postId)
+  const getPost = usePostStore((state) => state.getPost)
+  const post = usePostStore((state) => state.posts.find((item) => item.id === postId) ?? null)
+  const isLoading = usePostStore((state) => state.isLoading) || Boolean(postId && !post)
+
+  useEffect(() => {
+    if (postId) void getPost(postId).catch(() => undefined)
+  }, [getPost, postId])
+
+  if (isLoading) {
+    return <main className="post-not-found" role="status">Loading update…</main>
+  }
 
   if (!post) {
     return <main className="post-not-found"><p className="section-kicker">404 / UPDATE NOT FOUND</p><h1>This update is no longer here.</h1><Link to="/">Back to the bulletin</Link></main>

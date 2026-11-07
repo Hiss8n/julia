@@ -1,28 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import type { BulletinPost } from '../types'
 import { useAuthStore } from '../store/authStore'
+import { usePostStore } from '../store/postStore'
 
-const COMMUNITY_POSTS_KEY = 'julia_community_posts'
 
-export function getBulletinPosts(): BulletinPost[] {
-	try {
-		const savedPosts: unknown = JSON.parse(localStorage.getItem(COMMUNITY_POSTS_KEY) ?? '[]')
-		if (Array.isArray(savedPosts)) return [...savedPosts as BulletinPost[], ...posts]
-	} catch {
-		return posts
-	}
-	
-	return posts
-}
 
-export function saveBulletinPost(post: BulletinPost) {
-	const existingPosts = getBulletinPosts().filter((item) => !posts.some((sample) => sample.id === item.id))
-	localStorage.setItem(COMMUNITY_POSTS_KEY, JSON.stringify([post, ...existingPosts]))
-}
-
-export const posts: BulletinPost[] = [
+ export const posts: BulletinPost[] = [
 	{
 		id: 'nrc-community-support',
 		organization: 'NRC',
@@ -39,38 +24,8 @@ export const posts: BulletinPost[] = [
 			'A complete notice could include contact details, languages supported, accessibility information and the next date for community outreach.'
 		]
 	},
-	{
-		id: 'irc-health-outreach',
-		organization: 'IRC',
-		initials: 'I',
-		category: 'Health',
-		title: 'A guide to finding maternal and family health support',
-		summary: 'A sample explainer on the kinds of health services, clinic information and referral guidance families may look for.',
-		published: '4 hours ago',
-		image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=85',
-		imageAlt: 'Health worker speaking with a patient',
-		paragraphs: [
-			'Clear health information helps families understand where to seek care and what services may be available. This sample post shows how an organization could summarize clinic access and referral steps.',
-			'Before visiting a facility, check the current opening hours and service availability through the organization or a trusted community focal point.',
-			'For urgent medical needs, use the locally established emergency pathway rather than relying on a bulletin post.'
-		]
-	},
-	{
-		id: 'unhcr-information',
-		organization: 'UNHCR',
-		initials: 'U',
-		category: 'Information',
-		title: 'Keeping your household documents and contact details up to date',
-		summary: 'A sample reminder about checking official information channels and keeping important household records together.',
-		published: 'Yesterday',
-		image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1000&q=85',
-		imageAlt: 'Notebook and pen on a desk',
-		paragraphs: [
-			'This sample information post demonstrates a useful bulletin format for reminders about household records, appointments and official communication channels.',
-			'Always use verified UNHCR channels for individual case questions. Do not share personal documents or sensitive details with unofficial accounts.',
-			'A published notice should include the date it was checked and a trusted way to verify the information.'
-		]
-	},
+	
+
 	{
 		id: 'drs-youth-services',
 		organization: 'DRS',
@@ -87,56 +42,11 @@ export const posts: BulletinPost[] = [
 			'Organizations can use this space to share a short update, participation requirements and a contact for questions.'
 		]
 	},
-	{
-		id: 'drc-community-services',
-		organization: 'DRC',
-		initials: 'D',
-		category: 'Community services',
-		title: 'Community support: where to start when you need a referral',
-		summary: 'A sample overview of how a clear referral notice can explain next steps and protect personal information.',
-		published: '2 days ago',
-		image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1000&q=85',
-		imageAlt: 'Community members meeting around a table',
-		paragraphs: [
-			'A good referral notice explains what kind of support is available, how to request it and what information is necessary to share.',
-			'Never post private case information in public comments. Ask the organization which confidential channel to use for personal requests.',
-			'This sample story is not an official DRC service update; confirm current services with the organization.'
-		]
-	},
-	{
-		id: 'don-bosco-skills',
-		organization: 'Don Bosco',
-		initials: 'DB',
-		category: 'Learning',
-		title: 'Skills training: what a useful course announcement should include',
-		summary: 'A sample guide to course notices with details on entry requirements, dates, duration and application steps.',
-		published: '2 days ago',
-		image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=85',
-		imageAlt: 'Students learning together in a classroom',
-		paragraphs: [
-			'Training announcements are most useful when they state the course topic, who can apply, the expected schedule and whether any materials are needed.',
-			'This sample post illustrates a format for a future Don Bosco update. Course availability and application dates must be checked with the training centre.',
-			'A complete announcement can also explain how applicants will be contacted and when they can expect a response.'
-		]
-	},
-	{
-		id: 'wfp-food-assistance',
-		organization: 'WFP',
-		initials: 'W',
-		category: 'Food assistance',
-		title: 'Food assistance information: dates, notices and trusted sources',
-		summary: 'A sample explainer about checking official food assistance notices and avoiding misinformation.',
-		published: '3 days ago',
-		image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85',
-		imageAlt: 'A meal prepared with fresh ingredients',
-		paragraphs: [
-			'Assistance dates and processes may change. This sample post shows how a bulletin can point readers toward official notices without publishing unverified distribution details.',
-			'Use trusted WFP and partner communication channels to confirm any schedule, eligibility or collection information.',
-			'Be cautious of messages asking for payment, passwords or personal details in exchange for assistance.'
-		]
-	}
-]
+	
 
+
+]
+ 
 const organizations = ['All organizations', 'NRC', 'IRC', 'UNHCR', 'DRS', 'DRC', 'Don Bosco', 'WFP']
 
 export function OrganizationMark({ post }: { post: BulletinPost }) {
@@ -145,17 +55,55 @@ export function OrganizationMark({ post }: { post: BulletinPost }) {
 
 export default function HomePage() {
 	const user = useAuthStore((state) => state.user)
+	const logout = useAuthStore((state) => state.logout)
 	const [organization, setOrganization] = useState('All organizations')
 	const [query, setQuery] = useState('')
-	if (user && !user.has_organisation) return <Navigate to="/organizations" replace />
-	const allPosts = getBulletinPosts()
+	const [accountMenuOpen, setAccountMenuOpen] = useState(false)
+	const accountMenuRef = useRef<HTMLDivElement>(null)
+	const navigate = useNavigate()
+	const allPosts = usePostStore((state) => state.posts)
+	const getPosts = usePostStore((state) => state.getPosts)
+	const postsLoading = usePostStore((state) => state.isLoading)
+	const postsError = usePostStore((state) => state.error)
+
 	const featuredPost = allPosts[0]
-	const showFeature = organization === 'All organizations' && query.trim() === ''
+	const showFeature = Boolean(featuredPost && organization === 'All organizations' && query.trim() === '')
 	const filteredPosts = allPosts.filter((post) => {
 		const matchesOrganization = organization === 'All organizations' || post.organization === organization
 		const searchText = `${post.organization} ${post.category} ${post.title} ${post.summary}`.toLowerCase()
 		return matchesOrganization && searchText.includes(query.trim().toLowerCase())
-	}).filter((post) => !showFeature || post.id !== featuredPost.id)
+	}).filter((post) => !showFeature || post.id !== featuredPost?.id)
+
+	useEffect(() => {
+		void getPosts().catch(() => undefined)
+	}, [getPosts])
+
+	useEffect(() => {
+		if (!accountMenuOpen) return
+
+		function closeMenu(event: MouseEvent | KeyboardEvent) {
+			if (event instanceof KeyboardEvent && event.key === 'Escape') {
+				setAccountMenuOpen(false)
+			} else if (event instanceof MouseEvent && !accountMenuRef.current?.contains(event.target as Node)) {
+				setAccountMenuOpen(false)
+			}
+		}
+
+		document.addEventListener('mousedown', closeMenu)
+		document.addEventListener('keydown', closeMenu)
+		return () => {
+			document.removeEventListener('mousedown', closeMenu)
+			document.removeEventListener('keydown', closeMenu)
+		}
+	}, [accountMenuOpen])
+
+	function handleLogout() {
+		logout()
+		navigate('/login', { replace: true })
+	}
+
+	
+	
 
 	return (
 		<div className="bulletin-shell">
@@ -167,9 +115,25 @@ export default function HomePage() {
 					{user?.has_organisation
 					? <Link to="/posts/new">Post <span aria-hidden="true">+</span></Link>
 					:<Link to="/organizations">Browse organizations <span aria-hidden="true">↗</span></Link>}
-						
-						
 					<Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link>
+					<div className="account-menu" ref={accountMenuRef}>
+						<button
+							className="user-avatar"
+							type="button"
+							aria-label="Open account menu"
+							aria-haspopup="menu"
+							aria-expanded={accountMenuOpen}
+							onClick={() => setAccountMenuOpen((open) => !open)}
+						>
+							{user?.first_name?.trim().charAt(0).toUpperCase() || '?'}
+						</button>
+						{accountMenuOpen && <div className="account-dropdown" role="menu">
+							<span className="account-dropdown-label">{user?.first_name} {user?.second_name}</span>
+							<button type="button" role="menuitem" onClick={handleLogout}>
+								<span className="account-menu-icon" aria-hidden="true">↪</span> Log out
+							</button>
+						</div>}
+					</div>
 				</nav>
 			</header>
 
@@ -183,7 +147,7 @@ export default function HomePage() {
 					<label className="bulletin-search"><span aria-hidden="true">⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search updates" aria-label="Search updates" /></label>
 				</section>
 
-				{showFeature && <section className="lead-story" aria-label="Featured update">
+				{featuredPost && showFeature && <section className="lead-story" aria-label="Featured update">
 					<Link className="lead-image-link" to={`/posts/${featuredPost.id}`} aria-label={`Read ${featuredPost.title}`}>
 						<img className="lead-image" src={featuredPost.image} alt={featuredPost.imageAlt} />
 						<span className="image-caption">KAKUMA <span>•</span> COMMUNITY LIFE</span>
@@ -208,6 +172,8 @@ export default function HomePage() {
 						</label>
 					</div>
 
+					{postsError && <p className="no-stories" role="alert">{postsError}</p>}
+					{postsLoading && allPosts.length === 0 && <p className="no-stories" role="status">Loading updates…</p>}
 					{filteredPosts.length > 0 ? <div className="story-grid">
 						{filteredPosts.map((post, index) => <article className={`story-card story-card-${index + 1}`} key={post.id}>
 							<Link className="story-image-link" to={`/posts/${post.id}`} tabIndex={-1} aria-hidden="true"><img src={post.image} alt="" loading="lazy" /></Link>

@@ -68,6 +68,6 @@ export type AuthState = {
 	error: string
 	register: (details: RegisterDetails) => Promise<boolean>
 	login: (details: LoginDetails) => Promise<boolean>
-	checkAuth: () =>boolean
+	checkAuth: () => Promise<boolean>
 	logout: () => void
 }
