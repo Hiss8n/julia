@@ -113,7 +113,7 @@ async def health():
         "status":"good!"
     }
 
-@app.post("/uplaod")
+@app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="File must be a PDF.")

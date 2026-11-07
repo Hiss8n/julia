@@ -4,6 +4,12 @@ import type { BulletinPost } from '../types'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 
+type PdfUploadResponse = {
+	status: string
+	filename: string
+	chunks_stored: number
+}
+
 type PostStore = {
 	posts: BulletinPost[]
 	isLoading: boolean
@@ -11,6 +17,7 @@ type PostStore = {
 	getPosts: () => Promise<BulletinPost[]>
 	getPost: (postId: BulletinPost['id']) => Promise<BulletinPost>
 	createPost: (post: BulletinPost) => Promise<BulletinPost>
+	uploadPdf: (pdfFile: File) => Promise<PdfUploadResponse>
 	updatePost: (
 		postId: BulletinPost['id'],
 		updates: Partial<Omit<BulletinPost, 'id'>>,
@@ -86,6 +93,34 @@ export const usePostStore = create<PostStore>((set) => ({
 			})
 			set((state) => ({ posts: [createdPost, ...state.posts.filter((item) => item.id !== createdPost.id)] }))
 			return createdPost
+		} catch (error) {
+			setRequestError(set, error)
+			throw error
+		} finally {
+			set({ isLoading: false })
+		}
+	},
+	uploadPdf: async (pdfFile) => {
+		set({ isLoading: true, error: null })
+		try {
+			const formData = new FormData()
+			formData.append('file', pdfFile)
+			const token = useAuthStore.getState().token
+			const response = await fetch(`${API_URL}/upload`, {
+				method: 'POST',
+				headers: token ? { Authorization: `Bearer ${token}` } : {},
+				body: formData,
+			})
+			const data: unknown = await response.json().catch(() => null)
+
+			if (!response.ok) {
+				const detail = typeof data === 'object' && data !== null && 'detail' in data
+					? data.detail
+					: undefined
+				throw new Error(typeof detail === 'string' ? detail : 'PDF upload failed')
+			}
+
+			return data as PdfUploadResponse
 		} catch (error) {
 			setRequestError(set, error)
 			throw error

@@ -15,6 +15,7 @@ export default function ComposePostPage() {
   const navigate = useNavigate()
   const isAdmin = useAuthStore((state) => Boolean(state.user?.has_organisation))
   const createPost = usePostStore((state) => state.createPost)
+  const uploadPdf = usePostStore((state) => state.uploadPdf)
 
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
@@ -35,6 +36,7 @@ export default function ComposePostPage() {
           reader.onerror = () => reject(new Error('Could not read the PDF'))
           reader.readAsDataURL(pdfFile)
         })
+        await uploadPdf(pdfFile)
         attachment = { name: pdfFile.name, dataUrl }
       } catch {
         setError('The PDF could not be read. Please choose it again.')
