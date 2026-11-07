@@ -33,6 +33,7 @@ class PostResponse(BaseModel):
 	model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 	id: str
+	can_edit: bool = False
 	organization: str
 	initials: str
 	category: str

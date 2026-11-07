@@ -352,6 +352,11 @@ button, textarea { font: inherit; }
 .article-summary { max-width: 670px; margin: 0; color: #5f6b6f; font-size: 16px; line-height: 1.65; }
 .article-date { margin: 16px 0 0; color: #777e7a; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
 .article-date i { padding: 0 6px; }
+.article-post-management { max-width: 720px; margin: 0 auto 24px; }
+.article-post-actions { justify-content: flex-start; }
+.article-post-actions .post-delete-button { background: #a63e34; }
+.article-post-actions .post-delete-button:hover { background: #842d25; }
+.article-edit-form { display: grid; gap: 16px; border: 1px solid #d5d3c9; padding: 18px; background: #eeede6; }
 .article-figure { margin: 0; }
 .article-figure img { width: 100%; max-height: 440px; display: block; object-fit: cover; background: #d6d5cd; }
 .article-figure figcaption { padding-top: 7px; color: #7a817d; font-size: 9px; }

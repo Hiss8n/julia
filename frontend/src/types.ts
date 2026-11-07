@@ -29,6 +29,7 @@ export type OrganizationDetails = {
 
 export type BulletinPost = {
 	id: string
+	can_edit?: boolean
 	organization: string
 	initials: string
 	category: string

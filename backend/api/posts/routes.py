@@ -32,19 +32,46 @@ def get_current_user(
 	return user
 
 
+def get_optional_user(
+	credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+	db: Session = Depends(get_db),
+) -> User | None:
+	if credentials is None:
+		return None
+
+	user_id = get_token_user_id(credentials.credentials)
+	user = db.get(User, user_id)
+	if user is None:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User no longer exists")
+	return user
+
+
 def _raise_service_error(error: PostServiceError) -> None:
 	raise HTTPException(status_code=error.status_code, detail=str(error)) from error
 
 
+def _serialize_post(post, user: User | None) -> PostResponse:
+	response = PostResponse.model_validate(post)
+	response.can_edit = bool(user and post.organisation.owner_id == user.id)
+	return response
+
+
 @router.get("/", response_model=list[PostResponse])
-def list_posts(db: Session = Depends(get_db)):
-	return post_service.list_posts(db)
+def list_posts(
+	db: Session = Depends(get_db),
+	user: User | None = Depends(get_optional_user),
+):
+	return [_serialize_post(post, user) for post in post_service.list_posts(db)]
 
 
 @router.get("/{post_id}", response_model=PostResponse)
-def get_post(post_id: str, db: Session = Depends(get_db)):
+def get_post(
+	post_id: str,
+	db: Session = Depends(get_db),
+	user: User | None = Depends(get_optional_user),
+):
 	try:
-		return post_service.read_post(db, post_id)
+		return _serialize_post(post_service.read_post(db, post_id), user)
 	except PostServiceError as error:
 		_raise_service_error(error)
 
@@ -56,7 +83,7 @@ def create_post(
 	user: User = Depends(get_current_user),
 ):
 	try:
-		return post_service.create_post(db, request, user.id)
+		return _serialize_post(post_service.create_post(db, request, user.id), user)
 	except PostServiceError as error:
 		_raise_service_error(error)
 
@@ -69,7 +96,7 @@ def update_post(
 	user: User = Depends(get_current_user),
 ):
 	try:
-		return post_service.update_post(db, post_id, request, user.id)
+		return _serialize_post(post_service.update_post(db, post_id, request, user.id), user)
 	except PostServiceError as error:
 		_raise_service_error(error)
 
