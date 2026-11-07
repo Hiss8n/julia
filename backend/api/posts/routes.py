@@ -52,7 +52,7 @@ def _raise_service_error(error: PostServiceError) -> None:
 
 def _serialize_post(post, user: User | None) -> PostResponse:
 	response = PostResponse.model_validate(post)
-	response.can_edit = bool(user and post.organisation.owner_id == user.id)
+	response.can_edit = bool(user and post.created_by_id == user.id)
 	return response
 
 

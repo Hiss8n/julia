@@ -119,7 +119,7 @@ export default function PostPage() {
         </div>
         {post.can_edit && <div className="article-post-management">
           {!isEditing ? <div className="compose-actions article-post-actions">
-            <button type="button" onClick={startEditing}>Edit post</button>
+            <button type="button" onClick={startEditing}>Update post</button>
             <button className="post-delete-button" type="button" onClick={() => void removePost()} disabled={isSaving}>Delete post</button>
           </div> : <form className="article-edit-form" onSubmit={saveEdits}>
             <label className="compose-field">Headline

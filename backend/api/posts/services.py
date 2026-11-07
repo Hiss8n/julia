@@ -43,7 +43,7 @@ def read_post(db: Session, post_id: str) -> Post:
 
 def _read_owned_post(db: Session, post_id: str, owner_id: int) -> Post:
 	post = read_post(db, post_id)
-	if post.organisation.owner_id != owner_id:
+	if post.created_by_id != owner_id:
 		raise PostForbiddenError("You do not own this post")
 	return post
 
@@ -56,6 +56,7 @@ def create_post(db: Session, request: PostCreate, owner_id: int) -> Post:
 	post = Post(
 		**request.model_dump(),
 		organisation_id=organisation.id,
+		created_by_id=owner_id,
 		organization=organisation.name,
 	)
 	db.add(post)

@@ -15,6 +15,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     has_organisation = Column(Boolean, nullable=False, default=False, server_default="false")
     organisation = relationship("Organisation", back_populates="owner", uselist=False)
+    created_posts = relationship("Post", back_populates="author")
 
 class Organisation(Base):
     __tablename__ = "organisations"
@@ -45,6 +46,7 @@ class Post(Base):
         nullable=False,
         index=True,
     )
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     organization = Column(String(100), nullable=False)
     initials = Column(String(20), nullable=False)
     category = Column(String(100), nullable=False)
@@ -56,6 +58,7 @@ class Post(Base):
     paragraphs = Column(JSON, nullable=False, default=list)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     organisation = relationship("Organisation", back_populates="posts")
+    author = relationship("User", back_populates="created_posts")
 	
    
 
