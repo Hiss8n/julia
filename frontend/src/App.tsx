@@ -26,11 +26,11 @@ export default function App() {
 
   if (isCheckingAuth) return <main className="login-shell" aria-live="polite">Checking your session…</main>
 
-  const isAuthenticated = Boolean(token)
+  const isAuthenticated = Boolean(token || localStorage.getItem('julia_access_token'))
   const protectedPage = (page: ReactNode) =>
     isAuthenticated ? page : <Navigate to="/login" replace />
   const authPage = (page: ReactNode) =>
-    isAuthenticated ? <Navigate to="/home" replace /> : page
+    isAuthenticated ? <Navigate to="/" replace /> : page
 
   return (
       <Routes>
@@ -43,7 +43,7 @@ export default function App() {
         <Route path="/posts/new" element={protectedPage(<ComposePostPage />)} />
         <Route path="/admin" element={protectedPage(<Admin />)} />
         <Route path="/chat" element={protectedPage(<ChatPage />)} />
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />} />
       </Routes>
   )
 }
