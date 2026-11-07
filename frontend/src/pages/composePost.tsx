@@ -79,7 +79,7 @@ export default function ComposePostPage() {
     <header className="bulletin-header">
       <Link className="bulletin-brand" to="/" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link>
       <div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
-      <nav className="bulletin-actions" aria-label="Main navigation"><Link to="/home">Cancel <span aria-hidden="true">×</span></Link></nav>
+      <nav className="bulletin-actions" aria-label="Main navigation"><Link to="/">Cancel <span aria-hidden="true">×</span></Link></nav>
     </header>
 
     <main className="compose-main">
@@ -123,9 +123,9 @@ export default function ComposePostPage() {
         </label>
         <p className="compose-disclaimer">Do not include private personal details, passwords, payment requests or unverified assistance schedules.</p>
         {error && <p className="compose-error" role="alert">{error}</p>}
-        <div className="compose-actions"><Link to="/home">Cancel</Link><button type="submit">Publish update <span aria-hidden="true">→</span></button></div>
+        <div className="compose-actions"><Link to="/">Cancel</Link><button type="submit">Publish update <span aria-hidden="true">→</span></button></div>
       </form>
     </main>
-    <footer className="bulletin-footer"><Link className="bulletin-brand" to="/home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Organization updates are shared directly by their registered profiles.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
+    <footer className="bulletin-footer"><Link className="bulletin-brand" to="/"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Organization updates are shared directly by their registered profiles.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
   </div>
 }
