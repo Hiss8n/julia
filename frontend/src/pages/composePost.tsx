@@ -77,13 +77,13 @@ export default function ComposePostPage() {
   return <div className="bulletin-shell compose-shell">
     <div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY BULLETIN</span><span>SHARE A LOCAL UPDATE</span></div>
     <header className="bulletin-header">
-      <Link className="bulletin-brand" to="/home" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link>
+      <Link className="bulletin-brand" to="/" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link>
       <div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
       <nav className="bulletin-actions" aria-label="Main navigation"><Link to="/home">Cancel <span aria-hidden="true">×</span></Link></nav>
     </header>
 
     <main className="compose-main">
-      <Link className="back-to-bulletin" to="/home">← <span>Back to updates</span></Link>
+      <Link className="back-to-bulletin" to="/">← <span>Back to updates</span></Link>
       <div className="compose-heading">
         <p className="section-kicker">Organisation Name</p>
         <h1>Share an organization update</h1>
