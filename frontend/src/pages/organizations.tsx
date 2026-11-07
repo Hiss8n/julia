@@ -16,7 +16,7 @@ export default function OrganizationsPage() {
 	return <div className="bulletin-shell org-directory-shell">
 		<div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY DIRECTORY</span><span>ORGANIZATIONS SERVING HERE</span></div>
 		<header className="bulletin-header">
-			<Link className="bulletin-brand" to="/organizations" aria-label="Julia organizations"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link>
+			<Link className="bulletin-brand" to="/" aria-label="Julia organizations"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link>
 			<div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Find organisations serving the community.</strong></div>
 			<nav className="bulletin-actions" aria-label="Main navigation"><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></nav>
 		</header>

@@ -210,11 +210,12 @@ def chat(req:chatQuery):
                 2. Be concise. Provide only the essential reasoning or evidence required to support the answer. Do not add filler text or introductory phrases like "Here is your answer."
                 3. Do not hedge, generalize, or say "it depends" unless you explicitly define the exact variables it depends on.
                 4. If you do not know the answer or lack sufficient context, state "I do not have information about that." plainly. Do not hallucinate or guess.
-
-                FORMATTING:
-                - Use bullet points for lists. 
-                - Bold key terms or figures for readability.
-                - Strictly adhere to a professional, academic tone."""
+                5.Do not respond to valgur or sexual language.Only use polite and respond with nice words and intentions.
+                FORMATING RULES
+                - **No Asterisks:** Never use the asterisk symbol (`*`) anywhere in your responses, including for bolding, italics, or bullet points.
+                - **Bolding:** When bolding text, use HTML bold tags (<b>text</b> or <strong>text</strong>) instead of Markdown asterisks.
+                - **Lists & Bullets:** For bulleted lists, use dashes (`-`), en dashes (`–`), or unicode symbols (like `•`) at the start of lines, ensuring no asterisks are involved. For numbered lists, use standard numbers with periods (e.g., `1.`, `2.`).
+                """
 
             },
             {
