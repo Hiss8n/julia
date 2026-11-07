@@ -109,7 +109,7 @@ export default function HomePage() {
 		<div className="bulletin-shell">
 			<div className="bulletin-topline"><span>KAKUMA, TURKANA COUNTY</span><span>COMMUNITY BULLETIN <i>•</i> SAMPLE EDITION</span><span>INFORMATION THAT MATTERS HERE</span></div>
 			<header className="bulletin-header">
-				<Link className="bulletin-brand" to="/home" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /> <span>Julia<span className="brand-period">.</span></span></Link>
+				<Link className="bulletin-brand" to="/" aria-label="Julia Bulletin home"><img src="/logo.png" alt="" /> <span>Julia<span className="brand-period">.</span></span></Link>
 				<div className="bulletin-brand-copy"><span>KAKUMA</span><strong>Community news, from the organizations serving here.</strong></div>
 				<nav className="bulletin-actions" aria-label="Main navigation">
 					{user?.has_organisation
@@ -188,7 +188,7 @@ export default function HomePage() {
 				</section>
 			</main>
 
-			<footer className="bulletin-footer"><Link className="bulletin-brand" to="/home"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Sample bulletin content for demonstration. Confirm service details with the organization before acting on an update.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
+			<footer className="bulletin-footer"><Link className="bulletin-brand" to="/"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Sample bulletin content for demonstration. Confirm service details with the organization before acting on an update.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
 		</div>
 	)
 }

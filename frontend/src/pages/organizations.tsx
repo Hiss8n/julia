@@ -60,6 +60,6 @@ export default function OrganizationsPage() {
 				</li>)}
 			</ul>}
 		</main>
-		<footer className="bulletin-footer"><Link className="bulletin-brand" to="/organizations"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Connect with Julia for community information.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
+		<footer className="bulletin-footer"><Link className="bulletin-brand" to="/"><img src="/logo.png" alt="" /><span>Julia<span className="brand-period">.</span></span></Link><p>Connect with Julia for community information.</p><Link to="/chat">Ask Julia <span aria-hidden="true">↗</span></Link></footer>
 	</div>
 }
