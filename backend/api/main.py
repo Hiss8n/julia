@@ -73,7 +73,8 @@ def create_database_tables():
 origins=[
     "http://localhost:5173",
     "https://julia-c2n3.vercel.app", 
-    "http://localhost:8000",                   
+    "http://localhost:8000", 
+                     
     ]
 
 app.add_middleware(
