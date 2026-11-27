@@ -116,7 +116,7 @@ export default function SignUp() {
 						</div>
 
 						<div className="signup-field">
-							<label htmlFor="signup-password">Password</label>
+							<label htmlFor="signup-password">Password, must be at least 8 characters</label>
 							<div className="login-password-field">
 								<input
 									id="signup-password"
