@@ -91,3 +91,19 @@ def delete_organisation(db: Session, organisation_id: int, owner_id: int) -> Non
 	organisation = _read_owned_organisation(db, organisation_id, owner_id)
 	db.delete(organisation)
 	db.commit()
+
+
+def subscribe_to_organisation(db: Session, organisation_id: int, phone: str) -> bool:
+	organisation = read_organisation(db, organisation_id)
+	phone = "".join(character for character in phone.strip() if character not in " ().-")
+	if sum(character.isdigit() for character in phone) < 7 or sum(character.isdigit() for character in phone) > 15:
+		raise InvalidOrganisationUpdateError("Enter a valid phone number")
+
+	subscribers = list(organisation.subscribed or [])
+	if phone in subscribers:
+		return False
+
+	subscribers.append(phone)
+	organisation.subscribed = subscribers
+	db.commit()
+	return True

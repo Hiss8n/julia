@@ -3,7 +3,7 @@ import io
 from dotenv import load_dotenv
 import cohere
 from pydantic import BaseModel
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -11,8 +11,10 @@ import httpx
 from api.auth.routes import router as auth_router
 from api.database import Base, engine
 from api import models  # noqa: F401
-from api.organisation.routes import router as organisation_router
+from api.organisation.routes import get_current_user, router as organisation_router
+from api.messages import router as messages_router, send_upload_notification
 from api.posts.routes import router as posts_router
+from api.models import User
 from pinecone import Pinecone, TextQuery
 
 load_dotenv()
@@ -30,6 +32,7 @@ co = cohere.ClientV2(api_key=COHERE)
 app=FastAPI()
 app.include_router(auth_router)
 app.include_router(organisation_router)
+app.include_router(messages_router)
 app.include_router(posts_router)
 
 
@@ -83,9 +86,12 @@ async def health():
     }
 
 @app.post("/upload")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(file: UploadFile = File(...), user: User = Depends(get_current_user)):
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="File must be a PDF.")
+    organisation = user.organisation
+    if organisation is None:
+        raise HTTPException(status_code=403, detail="An organization is required to upload documents.")
     print("runned")
     
     try:
@@ -122,6 +128,12 @@ async def upload_pdf(file: UploadFile = File(...)):
             documents=pinecone_documents,
         )
 
+        notification_status = "sent"
+        try:
+            send_upload_notification(organisation.phone, organisation.name, file.filename)
+        except Exception:
+            notification_status = "failed"
+
     
        # return response.embeddings.float_[0]
 
@@ -129,7 +141,8 @@ async def upload_pdf(file: UploadFile = File(...)):
         return {
             "status": "success",
             "filename": file.filename,
-            "chunks_stored": len(documents)
+            "chunks_stored": len(documents),
+            "notification_status": notification_status,
         }
 
     except Exception as e:

@@ -30,6 +30,7 @@ class Organisation(Base):
     email = Column(String(320), nullable=False)
     logo = Column(Text, nullable=False, default="")
     admin = Column(String(200), nullable=True)
+    subscribed = Column(JSON, nullable=False, default=list)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     owner = relationship("User", back_populates="organisation")

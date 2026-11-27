@@ -8,6 +8,7 @@ python-dotenv
 python-multipart
 APScheduler
 httpx
+africastalking
 sqlalchemy
 psycopg[binary]
 bcrypt

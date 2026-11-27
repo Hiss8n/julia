@@ -10,6 +10,7 @@ from api.organisation.schemas import (
 	OrganisationCreate,
 	OrganisationCreateResponse,
 	OrganisationResponse,
+	OrganisationSubscribe,
 	OrganisationUpdate,
 )
 from api.organisation.services import OrganisationServiceError

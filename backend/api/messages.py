@@ -1,29 +1,41 @@
 import os
 import africastalking
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from api.organisation.routes import get_current_user
 
 load_dotenv()
 
-africastalking.initialize(
-    username=os.getenv("AT_USERNAME"),
-    api_key=os.getenv("AT_API_KEY"),
-)
-sms = africastalking.SMS
+router = APIRouter(prefix="/messages", tags=["messages"])
 
-app = FastAPI()
+class UploadNotificationRequest(BaseModel):
+    filename: str
 
 
-class SMSRequest(BaseModel):
-    recipients: list[str]  # e.g. ["+254712345678"]
-    message: str
+def send_upload_notification(phone: str, organisation_name: str, filename: str) -> None:
+    username = os.getenv("AT_USERNAME")
+    api_key = os.getenv("AT_API_KEY")
+    if not username or not api_key:
+        raise RuntimeError("SMS provider is not configured")
+
+    africastalking.initialize(username=username, api_key=api_key)
+    message = f"A new document, {filename}, was uploaded by {organisation_name}."
+    africastalking.SMS.send(message, [phone])
 
 
-@app.post("/send-sms")
-def send_sms(data: SMSRequest):
+@router.post("/upload-notification")
+def send_upload_notification_route(
+    data: UploadNotificationRequest,
+    user=Depends(get_current_user),
+):
+    organisation = user.organisation
+    if organisation is None:
+        raise HTTPException(status_code=403, detail="An organization is required to send upload notifications")
+
     try:
-        response = sms.send(data.message, data.recipients)
-        return response
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        send_upload_notification(organisation.phone, organisation.name, data.filename)
+    except Exception as error:
+        raise HTTPException(status_code=502, detail="SMS notification could not be sent") from error
+
+    return {"status": "sent"}
