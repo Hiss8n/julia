@@ -1,12 +1,12 @@
 # Julia Backend API
 
-This directory contains the FastAPI backend for Julia. It accepts PDF uploads, stores extracted page text in Chroma Cloud, and answers questions using retrieved text and Cohere.
+This directory contains the FastAPI backend for Julia. It accepts PDF uploads, stores extracted page text in Pinecone, and answers questions using retrieved text and Cohere.
 
 ## Requirements
 
 - Python 3.10 or newer
 - A Cohere API key
-- A Chroma Cloud tenant, database, and API key
+- A Pinecone API key and index
 - For deployment: a Vercel account and the Vercel CLI, or a Git repository connected to Vercel
 
 ## Configuration
@@ -15,13 +15,13 @@ Create a `.env` file in this directory for local development:
 
 ```env
 COHERE=your_cohere_api_key
-CHROMA_TENANT=your_chroma_tenant
-CHROMA_DATABASE=your_chroma_database
-CHROMA_API_KEY=your_chroma_api_key
-CHROMA_HOST=your_chroma_host
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=your_pinecone_index_name
+PINECONE_TEXT_FIELD=chunk_text
+PINECONE_NAMESPACE=default
 ```
 
-The application reads these values when it starts. `COHERE`, `CHROMA_TENANT`, `CHROMA_DATABASE`, and `CHROMA_API_KEY` are used by the current implementation. `CHROMA_HOST` is read but is not currently used to construct the Chroma Cloud client. Do not commit `.env` or put secret values in source control.
+The application reads these values when it starts. The configured index must have a text field with integrated embedding enabled; `PINECONE_TEXT_FIELD` must match that field (the current index uses `chunk_text`). Pinecone embeds uploaded pages and search queries using the index's configured model. Do not commit `.env` or put secret values in source control.
 
 Authentication configuration:
 
@@ -98,7 +98,7 @@ Health check. Returns a small JSON status response:
 
 ### `POST /uplaod`
 
-Uploads a PDF as `multipart/form-data` using the field name `file`. The path is spelled `/uplaod` in the current backend, so clients must use that exact path. The endpoint extracts text from PDF pages and attempts to store it in the Chroma collection named `agents`.
+Uploads a PDF as `multipart/form-data` using the field name `file`. The path is spelled `/uplaod` in the current backend, so clients must use that exact path. The endpoint extracts and embeds each non-empty page, then stores its text and source/page details in Pinecone vector metadata.
 
 Example with curl:
 
@@ -107,11 +107,11 @@ curl -X POST http://localhost:8000/uplaod \
 	-F "file=@document.pdf"
 ```
 
-A successful response includes `status`, `filename`, and `chunks_stored`. Non-PDF files and PDFs with no extractable text are rejected. The current upload implementation embeds only one text value while upserting all extracted pages, so multi-page uploads may fail; this behavior should be corrected in the implementation before relying on multi-page ingestion.
+A successful response includes `status`, `filename`, and `chunks_stored`. Non-PDF files and PDFs with no extractable text are rejected.
 
 ### `POST /query`
 
-Accepts a JSON object with a `message` string, embeds the question, retrieves up to two matching documents from Chroma, and returns a Cohere-generated answer.
+Accepts a JSON object with a `message` string, embeds the question, retrieves up to two matching documents from Pinecone, and returns a Cohere-generated answer.
 
 Request:
 
@@ -144,7 +144,7 @@ The included `vercel.json` configures `api/main.py` as a Python serverless funct
 ### Vercel Dashboard
 
 1. Import the repository into Vercel and select the `backend` directory as the project root.
-2. In the project settings, add these environment variables for the deployments you plan to use: `COHERE`, `CHROMA_TENANT`, `CHROMA_DATABASE`, `CHROMA_API_KEY`, `DATABASE_URL`, and `AUTH_SECRET_KEY`. Set `CHROMA_HOST` too if retaining the current configuration; it is read but currently unused.
+2. In the project settings, add these environment variables for the deployments you plan to use: `COHERE`, `PINECONE_API_KEY`, `PINECONE_INDEX`, `PINECONE_TEXT_FIELD`, `PINECONE_NAMESPACE`, `DATABASE_URL`, and `AUTH_SECRET_KEY`.
 3. Keep the framework preset as **Other**. The Vercel Python builder uses `vercel.json` and `requirements.txt`; no separate build command is needed.
 4. Deploy the project. After deployment, check the deployment URL at `/` and open `/docs` to inspect the API.
 
@@ -169,5 +169,5 @@ After changing environment variables in Vercel, redeploy so the new values are a
 ## Notes
 
 - CORS currently allows all origins. Restrict `allow_origins` in `api/main.py` to the frontend's deployed origin before using the API in production.
-- Vercel functions are serverless. Treat Chroma Cloud as the persistent store; do not rely on files written to the function's local filesystem to persist between requests.
+- Vercel functions are serverless. Treat Pinecone as the persistent store; do not rely on files written to the function's local filesystem to persist between requests.
 - The upload route currently has the spelling `/uplaod`; changing it requires updating any frontend client that calls it.

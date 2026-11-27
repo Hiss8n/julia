@@ -1,9 +1,6 @@
 import os
 import io
 from dotenv import load_dotenv
-load_dotenv()
-
-import chromadb
 import cohere
 from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException
@@ -16,48 +13,19 @@ from api.database import Base, engine
 from api import models  # noqa: F401
 from api.organisation.routes import router as organisation_router
 from api.posts.routes import router as posts_router
+from pinecone import Pinecone, TextQuery
 
-
+load_dotenv()
 
 COHERE=os.getenv("COHERE") 
+PINECONE_API_KEY=os.getenv("PINECONE_API_KEY")
+PINECONE_INDEX = os.getenv("PINECONE_INDEX", "julia-kakuma")
+PINECONE_TEXT_FIELD = os.getenv("PINECONE_TEXT_FIELD", "chunk_text")
+PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "default")
 
-co = cohere.ClientV2(
-        api_key=COHERE
-        )
-
-client = cohere.ClientV2(
-api_key=COHERE
-) 
-
-
-
-CHROMA_TENANT=os.getenv("CHROMA_TENANT") 
-CHROMA_HOST=os.getenv("CHROMA_HOST") 
-CHROMA_API_KEY=os.getenv("CHROMA_API_KEY") 
-CHROMA_DATABASE=os.getenv("CHROMA_DATABASE") 
-
-
-
-CHROMA_SERVER_HOST = os.getenv("CHROMA_SERVER_HOST", "api.trychroma.com")
-CHROMA_SERVER_PORT = int(os.getenv("CHROMA_SERVER_PORT", "443"))
-CHROMA_TENANT = os.getenv("CHROMA_TENANT", "")
-CHROMA_DATABASE = os.getenv("CHROMA_DATABASE", "")
-CHROMA_AUTH_TOKEN = os.getenv("CHROMA_AUTH_TOKEN", "") 
-
-
-#Connecting to a remote/cloud Chroma instance using HttpClient or Auth tokens
-chroma_client = chromadb.CloudClient(  
-    tenant=CHROMA_TENANT,
-    database=CHROMA_DATABASE,
-    api_key=CHROMA_AUTH_TOKEN,
-    
-)
-print(f"anyways: {chroma_client.heartbeat()}")
- 
-collection =chroma_client.get_or_create_collection(
-    name="agents",
-    metadata={"hnsw:space": "cosine"}
-)
+pc = Pinecone(api_key=PINECONE_API_KEY)
+index = pc.Index(PINECONE_INDEX)
+co = cohere.ClientV2(api_key=COHERE)
 
 app=FastAPI()
 app.include_router(auth_router)
@@ -140,29 +108,19 @@ async def upload_pdf(file: UploadFile = File(...)):
         if not documents:
             raise HTTPException(status_code=400, detail="No text could be extracted from the PDF.")
 
-        # 4. Store documents in the remote database
-        # This automatically triggers embeddings locally via embedding_function 
-        # and sends the payload to your remote Chroma instance over HTTP.
 
-        client = cohere.ClientV2(
-                api_key=COHERE
-            )
-
-        response = client.embed(
-                texts=[text],
-                model="embed-english-v3.0",
-                input_type="search_document",
-                embedding_types=["float"],
-                output_dimension=1024
-            )
- 
-        collection.upsert(
-                ids=ids,
-                documents=documents,
-                embeddings=response.embeddings.float_[0]
-            )
-        print("***")
-        print("done!!!")
+        pinecone_documents = [
+            {
+                "_id": document_id,
+                PINECONE_TEXT_FIELD: document,
+                **metadata,
+            }
+            for document_id, metadata, document in zip(ids, metadatas, documents)
+        ]
+        index.documents.upsert(
+            namespace=PINECONE_NAMESPACE,
+            documents=pinecone_documents,
+        )
 
     
        # return response.embeddings.float_[0]
@@ -180,23 +138,23 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/query")
 def chat(req:chatQuery):
-    vec = co.embed(
-        texts=[req.message],
-        model="embed-english-v3.0",
-        input_type="search_query",
-        embedding_types=["float"],
-        output_dimension=1024
-    )
-    #print(f"EMD{response.embeddings.float_[0]}")
-    
-    result=collection.query(
-    query_embeddings=[
-        vec.embeddings.float_[0]
-    ],
-    n_results=2
+    result = index.documents.search(
+        namespace=PINECONE_NAMESPACE,
+        top_k=2,
+        score_by=[
+            TextQuery(
+                field=PINECONE_TEXT_FIELD,
+                query=req.message,
+            )
+        ],
+        include_fields=[PINECONE_TEXT_FIELD],
     )
 
-    retrieved_context = " ".join(result['documents'][0])
+    retrieved_context = " ".join(
+        getattr(match, PINECONE_TEXT_FIELD, "")
+        for match in result.matches
+        if getattr(match, PINECONE_TEXT_FIELD, None)
+    )
     #print(f"ret{retrieved_context}")
    
     user_prompt = f"Context:\n{retrieved_context}\n\nQuestion: {req.message}"
