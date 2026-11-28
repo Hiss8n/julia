@@ -44,7 +44,8 @@ def create_database_tables():
 origins=[
     "http://localhost:5173",
     "https://julia-c2n3.vercel.app", 
-    "http://127.0.0.1:8000", 
+    "https://julia-c2n3.vercel.app/"
+
                      
     ]
 
