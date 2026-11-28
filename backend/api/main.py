@@ -42,18 +42,16 @@ def create_database_tables():
     Base.metadata.create_all(bind=engine)
 
 
-origins=[
+origins = {
     "http://localhost:5173",
-    "https://julia-c2n3.vercel.app", 
-    FRONTEND_URL,
-    "*"
+    "https://julia-c2n3.vercel.app",
+}
+if FRONTEND_URL:
+    origins.add(FRONTEND_URL.rstrip("/"))
 
-                     
-    ]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
+app = CORSMiddleware(
+    app=app,
+    allow_origins=sorted(origins),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
