@@ -5,6 +5,7 @@ import cohere
 from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect, text
 from pypdf import PdfReader
 from apscheduler.schedulers.background import BackgroundScheduler
 import httpx
@@ -40,6 +41,17 @@ app.include_router(posts_router)
 @app.on_event("startup")
 def create_database_tables():
     Base.metadata.create_all(bind=engine)
+    columns = {column["name"] for column in inspect(engine).get_columns("users")}
+    if "phone" not in columns:
+        with engine.begin() as connection:
+            if engine.dialect.name == "postgresql":
+                connection.execute(text(
+                    "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50) NOT NULL DEFAULT ''"
+                ))
+            else:
+                connection.execute(text(
+                    "ALTER TABLE users ADD COLUMN phone VARCHAR(50) NOT NULL DEFAULT ''"
+                ))
 
 
 origins = {
