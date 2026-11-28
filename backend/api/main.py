@@ -24,6 +24,7 @@ PINECONE_API_KEY=os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX", "julia-kakuma")
 PINECONE_TEXT_FIELD = os.getenv("PINECONE_TEXT_FIELD", "chunk_text")
 PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "default")
+FRONTEND_URL=os.getenv("FRONTEND_URL")
 
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX)
@@ -44,7 +45,8 @@ def create_database_tables():
 origins=[
     "http://localhost:5173",
     "https://julia-c2n3.vercel.app", 
-    "https://julia-c2n3.vercel.app/"
+    "https://julia-c2n3.vercel.app/",
+    FRONTEND_URL
 
                      
     ]
