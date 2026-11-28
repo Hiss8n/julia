@@ -45,7 +45,6 @@ def create_database_tables():
 origins=[
     "http://localhost:5173",
     "https://julia-c2n3.vercel.app", 
-    "https://julia-c2n3.vercel.app/",
     FRONTEND_URL
 
                      
@@ -133,11 +132,7 @@ async def upload_pdf(file: UploadFile = File(...), user: User = Depends(get_curr
 
         notification_status = "sent"
         try:
-            send_upload_notification(
-                organisation.phone,
-                organisation.name,
-                subscribers=list(organisation.subscribed or []),
-            )
+            send_upload_notification(organisation.phone, organisation.name, file.filename)
         except Exception:
             notification_status = "failed"
 
@@ -220,9 +215,9 @@ def chat(req:chatQuery):
             answer_text = response.message.content[0].text
 
     return {"answer": answer_text}
+    
 
-
-
+ 
 
 
 
