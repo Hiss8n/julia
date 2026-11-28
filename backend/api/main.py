@@ -61,8 +61,8 @@ origins = {
 if FRONTEND_URL:
     origins.add(FRONTEND_URL.rstrip("/"))
 
-app = CORSMiddleware(
-    app=app,
+app.add_middleware(
+    CORSMiddleware,
     allow_origins=sorted(origins),
     allow_credentials=True,
     allow_methods=["*"],
