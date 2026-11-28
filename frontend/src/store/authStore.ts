@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	isLoading: false,
 	error: '',
 
-	register: async ({ firstName, secondName, email, password, has_organisation }: RegisterDetails) => {
+	register: async ({ firstName, secondName, phone, email, password, has_organisation }: RegisterDetails) => {
 		set({ isLoading: true, error: '' })
 		try {
 			const data = await request<AuthResponse>('/auth/register', {
@@ -57,6 +57,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 				body: JSON.stringify({
 					first_name: firstName,
 					second_name: secondName,
+					phone,
 					email,
 					password,
 					has_organisation,

@@ -10,6 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String(100), nullable=False)
     second_name = Column(String(100), nullable=False)
+    phone = Column(String(50), nullable=False, default="")
     email = Column(String(320), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
@@ -60,6 +61,6 @@ class Post(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     organisation = relationship("Organisation", back_populates="posts")
     author = relationship("User", back_populates="created_posts")
-	
-   
+
+
 

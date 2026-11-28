@@ -10,8 +10,8 @@ from api.organisation.schemas import (
 	OrganisationCreate,
 	OrganisationCreateResponse,
 	OrganisationResponse,
-	OrganisationSubscribe,
 	OrganisationUpdate,
+	OrganisationSubscribeResponse,
 )
 from api.organisation.services import OrganisationServiceError
 
@@ -95,3 +95,28 @@ def delete_organisation(
 		organisation_service.delete_organisation(db, organisation_id, user.id)
 	except OrganisationServiceError as error:
 		_raise_service_error(error)
+
+
+@router.post("/{organisation_id}/subscribe", response_model=OrganisationSubscribeResponse)
+def subscribe_to_organisation(
+	organisation_id: int,
+	db: Session = Depends(get_db),
+	user: User = Depends(get_current_user),
+):
+	try:
+		organisation = organisation_service.read_organisation(db, organisation_id)
+	except OrganisationServiceError as error:
+		_raise_service_error(error)
+
+	phone = ''.join(character for character in user.phone if character.isdigit() or character == '+')
+	if not phone:
+		raise HTTPException(status_code=400, detail="Add a valid phone number to your account before following organizations")
+
+	subscribers = list(organisation.subscribed or [])
+	if phone not in subscribers:
+		subscribers.append(phone)
+		organisation.subscribed = subscribers
+		db.commit()
+		db.refresh(organisation)
+
+	return OrganisationSubscribeResponse(message="You are now subscribed to organisation updates")

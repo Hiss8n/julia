@@ -15,6 +15,7 @@ def register_user(db: Session, request: RegisterRequest) -> User:
     user = User(
         first_name=request.first_name,
         second_name=request.second_name,
+        phone=request.phone,
         email=str(request.email),
         password_hash=hash_password(request.password),
         has_organisation=request.has_organisation

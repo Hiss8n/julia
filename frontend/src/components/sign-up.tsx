@@ -14,6 +14,7 @@ export default function SignUp() {
 	const [userData, setUserData] = useState<RegisterDetails>({
 		firstName: '',
 		secondName: '',
+		phone: '',
 		email: '',
 		password: '',
 		has_organisation: false,
@@ -99,6 +100,20 @@ export default function SignUp() {
 									required
 								/>
 							</div>
+						</div>
+
+						<div className="signup-field signup-email-field">
+							<label htmlFor="signup-phone">Phone number</label>
+							<input
+								id="signup-phone"
+								name="phone"
+								type="tel"
+								placeholder="Your phone number"
+								autoComplete="tel"
+								value={userData.phone}
+								onChange={handleInputChange}
+								required
+							/>
 						</div>
 
 						<div className="signup-field signup-email-field">

@@ -5,6 +5,7 @@ load_dotenv()
 class RegisterRequest(BaseModel):
     first_name: str = Field(min_length=1, max_length=100)
     second_name: str = Field(min_length=1, max_length=100)
+    phone: str = Field(min_length=1, max_length=50)
     email: EmailStr
     password: str = Field(min_length=8, max_length=72)
     has_organisation: bool = False
@@ -16,12 +17,12 @@ class RegisterRequest(BaseModel):
             raise ValueError("Password must be at most 72 UTF-8 bytes")
         return value
 
-    @field_validator("first_name", "second_name")
+    @field_validator("first_name", "second_name", "phone")
     @classmethod
-    def strip_names(cls, value: str) -> str:
+    def strip_required_text(cls, value: str) -> str:
         cleaned = value.strip()
         if not cleaned:
-            raise ValueError("Name cannot be empty")
+            raise ValueError("This field cannot be empty")
         return cleaned
 
     @field_validator("email")
@@ -53,6 +54,7 @@ class UserResponse(BaseModel):
     id: int
     first_name: str
     second_name: str
+    phone: str
     email: EmailStr
     has_organisation: bool = False
 

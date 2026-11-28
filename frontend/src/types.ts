@@ -2,6 +2,7 @@ export type AuthUser = {
 	id: number
 	first_name: string
 	second_name: string
+	phone: string
 	email: string
 	has_organisation: boolean
 }
@@ -9,6 +10,7 @@ export type AuthUser = {
 export type RegisterDetails = {
 	firstName: string
 	secondName: string
+	phone: string
 	email: string
 	password: string
 	has_organisation: boolean

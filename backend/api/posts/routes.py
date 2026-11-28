@@ -8,6 +8,7 @@ from api.models import User
 from api.posts import services as post_service
 from api.posts.schemas import PostCreate, PostResponse, PostUpdate
 from api.posts.services import PostServiceError
+from api.messages import send_update_notifications
 
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -83,7 +84,12 @@ def create_post(
 	user: User = Depends(get_current_user),
 ):
 	try:
-		return _serialize_post(post_service.create_post(db, request, user.id), user)
+		post = post_service.create_post(db, request, user.id)
+		try:
+			send_update_notifications(post.organization, list(post.organisation.subscribed or []))
+		except Exception:
+			pass
+		return _serialize_post(post, user)
 	except PostServiceError as error:
 		_raise_service_error(error)
 
@@ -96,7 +102,9 @@ def update_post(
 	user: User = Depends(get_current_user),
 ):
 	try:
-		return _serialize_post(post_service.update_post(db, post_id, request, user.id), user)
+		post = post_service.update_post(db, post_id, request, user.id)
+		send_update_notifications(post_id, user.id)
+		return _serialize_post(post, user)
 	except PostServiceError as error:
 		_raise_service_error(error)
 

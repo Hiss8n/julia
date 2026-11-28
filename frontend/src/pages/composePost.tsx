@@ -46,7 +46,7 @@ export default function ComposePostPage() {
 
     const paragraphs = body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean)
     const organization = 'Sample Organization'
-    const initials = 'SO'
+    const initials ="SO"
     const post: BulletinPost = {
       id: `community-${crypto.randomUUID()}`,
       organization,

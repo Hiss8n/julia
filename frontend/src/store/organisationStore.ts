@@ -19,6 +19,7 @@ type OrganizationState = {
     createOrganization: (details: OrganizationDetails) => Promise<Organization>
     updateOrganization: (orgId: number,details: Partial<OrganizationDetails>,) => Promise<Organization>
     deleteOrganization: (orgId: number) => Promise<void>
+    subscribeOrganization: (orgId: number) => Promise<void>
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -151,5 +152,11 @@ export const useOrganizationStore = create<OrganizationState>((set) => ({
         } finally {
             set({ isLoading: false })
         }
+    },
+
+    subscribeOrganization: async (orgId) => {
+        await request<{ success: boolean; message: string }>(`/organizations/${orgId}/subscribe`, {
+            method: 'POST',
+        })
     },
 }))

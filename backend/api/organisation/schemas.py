@@ -25,10 +25,6 @@ class OrganisationUpdate(BaseModel):
 	admin: str | None = Field(default=None, max_length=200)
 
 
-class OrganisationSubscribe(BaseModel):
-	phone: str = Field(min_length=7, max_length=30, pattern=r"^\+?[0-9][0-9\s().-]*$")
-
-
 class OrganisationResponse(BaseModel):
 	model_config = ConfigDict(from_attributes=True)
 
@@ -47,3 +43,12 @@ class OrganisationResponse(BaseModel):
 class OrganisationCreateResponse(OrganisationResponse):
 	success: bool = True
 	message: str = "Organization created successfully"
+
+
+class OrganisationSubscribe(BaseModel):
+	phone: str = Field(min_length=5, max_length=50)
+
+
+class OrganisationSubscribeResponse(BaseModel):
+	success: bool = True
+	message: str
