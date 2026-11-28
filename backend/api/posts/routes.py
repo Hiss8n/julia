@@ -8,7 +8,7 @@ from api.models import User
 from api.posts import services as post_service
 from api.posts.schemas import PostCreate, PostResponse, PostUpdate
 from api.posts.services import PostServiceError
-from api.messages import send_update_notifications
+from api.messages import send_upload_notification
 
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -86,7 +86,7 @@ def create_post(
 	try:
 		post = post_service.create_post(db, request, user.id)
 		try:
-			send_update_notifications(post.organization, list(post.organisation.subscribed or []))
+			send_upload_notification(post.organization, list(post.organisation.subscribed or []))
 		except Exception:
 			pass
 		return _serialize_post(post, user)
